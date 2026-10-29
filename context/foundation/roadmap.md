@@ -38,7 +38,7 @@ Get articles from my sources into a local database.
 **Exit:** `news fetch` pulls all configured feeds into SQLite without errors.
 _Met 2026-10-29 for HN, BBC, WP.pl, znosnenewsy.pl. Reddit could not meet it (rate-limited) and was replaced in 0005._
 
-## Phase 2 – Noise Removal 🔄
+## Phase 2 – Noise Removal ✅
 
 Turn a pile of articles into a short list of real stories.
 
@@ -48,7 +48,7 @@ Turn a pile of articles into a short list of real stories.
 | 0007-story-clustering – group same-event articles into stories (fuzzy titles, per language) | ✅ archived |
 | 0008-retention – delete articles 30 days after they leave their feed | ✅ archived |
 | 0009-rule-filters – muted topics, EN + PL clickbait patterns, with reasons | ✅ archived |
-| heuristic-scoring – rank by source weight, recency, coverage | ⏳ |
+| 0010-heuristic-scoring – rank by source weight, recency, coverage | ✅ archived |
 
 **Exit:** a day's articles reduce to a ranked story list; every drop has a reason.
 

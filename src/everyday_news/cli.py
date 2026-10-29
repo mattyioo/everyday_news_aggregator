@@ -1,5 +1,5 @@
 """Command-line entry point: `news fetch`, `news digest`, `news run`, `news sources`,
-`news stories`."""
+`news stories`, `news top`."""
 
 from datetime import UTC, datetime
 from pathlib import Path
@@ -15,6 +15,7 @@ from everyday_news.fetch import fetch_all, make_client
 from everyday_news.filters import FilterConfigError, Filters, apply_filters, load_filters
 from everyday_news.normalize import normalize_pending
 from everyday_news.prune import prune
+from everyday_news.rank import rank_stories
 from everyday_news.sources import DEFAULT_PATH, Source, SourceConfigError, load_sources
 
 app = typer.Typer(help="Personal news aggregator.", no_args_is_help=True)
@@ -148,3 +149,28 @@ def stories(db_path: DbOption = db.DEFAULT_PATH) -> None:
             current = r["id"]
             typer.echo(f"\n[{r['lang']}] {r['title']}  (updated {r['last_updated'][:16]})")
         typer.echo(f"    {r['source_id']:<12} {r['article_title']}")
+
+
+@app.command()
+def top(
+    limit: Annotated[int, typer.Option(help="How many stories to show")] = 20,
+    config: ConfigOption = DEFAULT_PATH,
+    settings_path: SettingsOption = cfg.DEFAULT_PATH,
+    db_path: DbOption = db.DEFAULT_PATH,
+) -> None:
+    """Show the ranked stories of the digest window with score parts (no network)."""
+    sources = _load(config)
+    settings = _load_settings(settings_path)
+    conn = db.connect(db_path)
+    try:
+        ranking = rank_stories(conn, sources, datetime.now(UTC), settings.digest_hours)
+    finally:
+        conn.close()
+
+    typer.echo(f"{len(ranking.stories)} stories in the last {settings.digest_hours} h")
+    for n, s in enumerate(ranking.stories[:limit], start=1):
+        note = f"  [downranked: {s.downranked}]" if s.downranked else ""
+        typer.echo(
+            f"{n:>3}. {s.score:.2f} (w {s.weight:.1f} × r {s.recency:.2f} × c {s.coverage:.2f})"
+            f"  {s.lead.source_id:<11} {s.lead.title}{note}"
+        )

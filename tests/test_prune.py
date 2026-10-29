@@ -128,4 +128,12 @@ def test_settings_file(tmp_path: Path) -> None:
 
 
 def test_project_settings_file_is_valid() -> None:
-    assert load_settings(Path(__file__).parent.parent / "settings.toml").retention_days == 7
+    settings = load_settings(Path(__file__).parent.parent / "settings.toml")
+    assert (settings.retention_days, settings.digest_hours) == (7, 24)
+
+
+def test_digest_hours_validated(tmp_path: Path) -> None:
+    path = tmp_path / "settings.toml"
+    path.write_text("digest_hours = 0\n", encoding="utf-8")
+    with pytest.raises(SettingsError, match="digest_hours must be a whole number from 1 to 720"):
+        load_settings(path)
