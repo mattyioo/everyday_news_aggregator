@@ -66,18 +66,18 @@ def run(sources, conn, server, *, at=T0, force=False, sleeps=None):
         )
 
 
-ALL = ["hn", "reddit-technology", "wp", "znosnenewsy"]
+ALL = ["hn", "bbc", "reddit-technology", "wp", "znosnenewsy"]
 
 
 def test_fetches_each_source_once_with_pauses_and_user_agent(conn) -> None:
     server, sleeps = Server(serve_fixtures), []
     results = run([source(i) for i in ALL], conn, server, sleeps=sleeps)
 
-    assert [r.status for r in results] == ["200"] * 4
-    assert len(server.requests) == 4
+    assert [r.status for r in results] == ["200"] * 5
+    assert len(server.requests) == 5
     assert all(r.headers["user-agent"] == USER_AGENT for r in server.requests)
-    assert sleeps == [PAUSE_SECONDS] * 3  # between requests, not before the first
-    assert conn.execute("SELECT COUNT(*) FROM raw_item").fetchone()[0] == 12
+    assert sleeps == [PAUSE_SECONDS] * 4  # between requests, not before the first
+    assert conn.execute("SELECT COUNT(*) FROM raw_item").fetchone()[0] == 15
 
 
 def test_parses_real_feed_formats(conn) -> None:

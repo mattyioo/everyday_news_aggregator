@@ -18,7 +18,7 @@ sources.toml ──► Fetch ──► Normalize ──► Dedupe/Cluster ──
 | **Fetch** | Runs once per app launch, never in the background. One request per enabled feed, sequential, honest User-Agent, conditional GET (ETag / Last-Modified), timeouts, no retry loops, 15 min cooldown per source (60 min after a failure), skip a source for the run on 429/5xx/timeout, never follow redirects. Stores raw items |
 | **Normalize** | Turn raw items into one `Article` shape (title, url, source, lang, published, text) |
 | **Dedupe/Cluster** | Drop exact duplicates (URL/hash); group articles about the same event into a `Story` by fuzzy title match, within one language |
-| **Filter/Score** | Rule-based only: muted topics, per-language clickbait patterns, heuristic score (source weight, recency, number of sources covering it, HN points / Reddit score). Every decision records a reason |
+| **Filter/Score** | Rule-based only: muted topics, per-language clickbait patterns, heuristic score (source weight, recency, number of sources covering it). Every decision records a reason |
 | **Summarize** | Extractive, no LLM: feed description, or the first sentences of the article text |
 | **Digest** | Render the day's top stories to Markdown (later: HTML / web view) |
 | **Tracking** *(Phase 4)* | Followed topics; show what is new since the last digest |

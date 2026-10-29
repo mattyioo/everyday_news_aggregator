@@ -11,7 +11,8 @@ from everyday_news.normalize import canonical_url, normalize_pending, parse_html
 from everyday_news.sources import Source
 
 FIXTURES = Path(__file__).parent / "fixtures"
-LANGS = {"hn": "en", "reddit-technology": "en", "wp": "pl", "znosnenewsy": "pl"}
+# Reddit is no longer configured, but its fixture keeps the generic `[link]` rule covered.
+LANGS = {"hn": "en", "bbc": "en", "reddit-technology": "en", "wp": "pl", "znosnenewsy": "pl"}
 SOURCES = [
     Source(id=i, name=i, url=f"https://{i}.example/feed", lang=lang) for i, lang in LANGS.items()
 ]
@@ -45,7 +46,7 @@ def articles(conn, source_id: str) -> list:
 
 
 def test_every_raw_item_becomes_one_clean_article(conn) -> None:
-    assert normalize_pending(conn, SOURCES) == 12
+    assert normalize_pending(conn, SOURCES) == 15
     for row in conn.execute("SELECT * FROM article"):
         assert row["title"] and row["url"].startswith("https://")
         assert row["lang"] == LANGS[row["source_id"]]
@@ -57,7 +58,7 @@ def test_every_raw_item_becomes_one_clean_article(conn) -> None:
 def test_normalize_is_idempotent(conn) -> None:
     normalize_pending(conn, SOURCES)
     assert normalize_pending(conn, SOURCES) == 0
-    assert conn.execute("SELECT COUNT(*) FROM article").fetchone()[0] == 12
+    assert conn.execute("SELECT COUNT(*) FROM article").fetchone()[0] == 15
 
 
 def test_hacker_news_keeps_discussion_and_drops_comments_text(conn) -> None:
@@ -84,6 +85,14 @@ def test_wordpress_footer_and_ellipsis_removed(conn) -> None:
     assert "pochodzi z serwisu" not in first["text"]
 
 
+def test_bbc_tracking_params_removed(conn) -> None:
+    normalize_pending(conn, SOURCES)
+    for row in articles(conn, "bbc"):
+        assert row["url"].startswith("https://www.bbc.co.uk/news/articles/")
+        assert "?" not in row["url"]
+        assert row["text"]
+
+
 def test_wp_image_dropped_lead_kept(conn) -> None:
     normalize_pending(conn, SOURCES)
     first = articles(conn, "wp")[0]
@@ -94,12 +103,14 @@ def test_wp_image_dropped_lead_kept(conn) -> None:
 def test_unknown_source_is_left_pending(conn) -> None:
     only_hn = [s for s in SOURCES if s.id == "hn"]
     assert normalize_pending(conn, only_hn) == 3
-    assert normalize_pending(conn, SOURCES) == 9
+    assert normalize_pending(conn, SOURCES) == 12
 
 
 def test_canonical_url_strips_tracking_only() -> None:
     url = "HTTPS://Example.COM/a/b?id=7&utm_source=x&utm_medium=y&fbclid=z#frag"
     assert canonical_url(url) == "https://example.com/a/b?id=7#frag"
+    bbc = "https://www.bbc.co.uk/news/articles/c1?at_medium=RSS&at_campaign=rss"
+    assert canonical_url(bbc) == "https://www.bbc.co.uk/news/articles/c1"
 
 
 def test_title_hash_ignores_case_punctuation_and_spacing() -> None:

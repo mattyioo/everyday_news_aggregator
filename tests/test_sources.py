@@ -42,7 +42,7 @@ def test_loads_valid_config_with_defaults(tmp_path: Path) -> None:
 
 def test_project_sources_file_is_valid() -> None:
     loaded = load_sources(PROJECT_SOURCES)
-    assert {s.id for s in loaded} == {"hn", "reddit-technology", "wp", "znosnenewsy"}
+    assert {s.id for s in loaded} == {"hn", "bbc", "wp", "znosnenewsy"}
     assert not any(s.fetch_fulltext for s in loaded)
 
 

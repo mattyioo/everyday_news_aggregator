@@ -1,6 +1,6 @@
 # everyday_news
 
-Personal news aggregator. Pulls Hacker News, r/technology, WP.pl and
+Personal news aggregator. Pulls Hacker News, BBC News World, WP.pl and
 znosnenewsy.pl, filters out the noise, and writes a short daily Markdown digest.
 
 ## Setup

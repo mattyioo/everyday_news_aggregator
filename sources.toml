@@ -21,12 +21,12 @@ enabled = true
 fetch_fulltext = false
 
 [[source]]
-id = "reddit-technology"
-name = "Reddit r/technology"
-url = "https://www.reddit.com/r/technology/.rss"
+id = "bbc"
+name = "BBC News World"
+url = "https://feeds.bbci.co.uk/news/world/rss.xml"
 lang = "en"
-weight = 0.8
-tags = ["tech"]
+weight = 1.0
+tags = ["general", "world"]
 enabled = true
 fetch_fulltext = false
 

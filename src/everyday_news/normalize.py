@@ -15,7 +15,7 @@ from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 from everyday_news.sources import Source
 
-TRACKING_PARAMS = {"fbclid", "gclid", "mc_cid", "mc_eid", "ref_src"}
+TRACKING_PARAMS = {"fbclid", "gclid", "mc_cid", "mc_eid", "ref_src", "at_medium", "at_campaign"}
 
 # WordPress footers: "Artykuł X pochodzi z serwisu Y." / "The post X appeared first on Y."
 FOOTERS = [
