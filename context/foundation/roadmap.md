@@ -6,7 +6,7 @@ described in `context/README.md`: Propose → Plan → Build → Verify → Arch
 
 A phase is done when all its changes are archived and its exit criteria hold.
 
-Status: ✅ done · 🔄 in progress · ⏳ not started
+Status: ✅ done · 🔄 in progress · ⏳ not started · ❌ dropped
 
 ---
 
@@ -27,8 +27,8 @@ Get articles from my sources into a local database.
 | Change | Status |
 |---|---|
 | 0001-project-skeleton – package, CLI stub, tooling, tests running | ✅ archived |
-| 0002-sources-config – `sources.toml` with HN, r/technology, WP.pl, znosnenewsy.pl (lang, tags, weights) | ⏳ |
-| 0003-feed-fetcher – fetch RSS/Atom, store raw items | ⏳ |
+| 0002-sources-config – `sources.toml` with HN, r/technology, WP.pl, znosnenewsy.pl (lang, tags, weights) | ✅ archived |
+| 0003-feed-fetcher – fetch RSS/Atom once per launch, politely (User-Agent, conditional GET, no retries); store raw items | ⏳ |
 | 0004-normalize-and-store – `Article` model, SQLite schema | ⏳ |
 
 **Exit:** `news fetch` pulls all configured feeds into SQLite without errors.
@@ -71,12 +71,12 @@ Follow stories over days instead of rereading them.
 
 ## Phase 5 – Automation & Polish
 
-Runs itself.
+Nicer to use.
 
 | Change | Status |
 |---|---|
-| 0014-scheduled-runs – daily systemd timer / cron | ⏳ |
+| ~~0014-scheduled-runs~~ – dropped: refresh only on launch (see decisions) | ❌ |
 | 0015-feedback-loop – mark items as noise/useful to tune filters | ⏳ |
 | 0016-web-view *(optional)* – local page for browsing digests | ⏳ |
 
-**Exit:** a digest appears every morning with no manual step.
+**Exit:** one `news run` on launch gives a tuned, readable digest.

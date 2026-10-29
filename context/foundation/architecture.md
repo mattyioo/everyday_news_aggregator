@@ -15,7 +15,7 @@ sources.toml ──► Fetch ──► Normalize ──► Dedupe/Cluster ──
 | Component | Responsibility |
 |---|---|
 | **Sources** | User-edited config listing feeds (RSS/Atom), with language, tags, weight and a `fetch_fulltext` flag |
-| **Fetch** | Download feeds, respecting timeouts and rate limits; store raw items |
+| **Fetch** | Runs once per app launch, never in the background. One request per enabled feed, sequential, honest User-Agent, conditional GET (ETag / Last-Modified), timeouts, no retry loops, skip a source for the run on 429/5xx. Stores raw items |
 | **Normalize** | Turn raw items into one `Article` shape (title, url, source, lang, published, text) |
 | **Dedupe/Cluster** | Drop exact duplicates (URL/hash); group articles about the same event into a `Story` by fuzzy title match, within one language |
 | **Filter/Score** | Rule-based only: muted topics, per-language clickbait patterns, heuristic score (source weight, recency, number of sources covering it, HN points / Reddit score). Every decision records a reason |

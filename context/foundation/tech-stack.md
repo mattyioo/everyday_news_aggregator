@@ -16,7 +16,7 @@
 | Tests | `pytest` | Standard |
 | Lint/format | `ruff` | One tool for both |
 | Output | Markdown digest files | Decision Q3 |
-| Scheduling | systemd user timer or cron *(Phase 5)* | Daily run without manual steps |
+| Scheduling | none: fetch once when the app is launched | Decision: no background or scheduled requests |
 
 ## Sources
 

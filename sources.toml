@@ -1,0 +1,51 @@
+# News sources. Edit freely: `news sources` shows what is loaded.
+#
+# id              short unique name, used in the database
+# name            display name
+# url             RSS/Atom feed
+# lang            "en" or "pl"
+# weight          ranking weight, 0.0–2.0 (1.0 = normal)
+# tags            free-form labels
+# enabled         false = skip without deleting
+# fetch_fulltext  also download each article page. Off by default: it means one
+#                 extra request per article, which is exactly the spammy pattern we avoid.
+
+[[source]]
+id = "hn"
+name = "Hacker News"
+url = "https://news.ycombinator.com/rss"
+lang = "en"
+weight = 1.0
+tags = ["tech"]
+enabled = true
+fetch_fulltext = false
+
+[[source]]
+id = "reddit-technology"
+name = "Reddit r/technology"
+url = "https://www.reddit.com/r/technology/.rss"
+lang = "en"
+weight = 0.8
+tags = ["tech"]
+enabled = true
+fetch_fulltext = false
+
+[[source]]
+id = "wp"
+name = "WP.pl Wiadomości"
+url = "https://wiadomosci.wp.pl/rss.xml"
+lang = "pl"
+weight = 0.7
+tags = ["general", "poland"]
+enabled = true
+fetch_fulltext = false
+
+[[source]]
+id = "znosnenewsy"
+name = "Znośne Newsy"
+url = "https://znosnenewsy.pl/feed"
+lang = "pl"
+weight = 1.0
+tags = ["general", "tech"]
+enabled = true
+fetch_fulltext = false

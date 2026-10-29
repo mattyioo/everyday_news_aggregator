@@ -17,6 +17,7 @@ python3 -m venv .venv
 
 ```sh
 .venv/bin/uv run news --help
+.venv/bin/uv run news sources  # list feeds from sources.toml
 .venv/bin/uv run news run      # fetch + digest
 ```
 
