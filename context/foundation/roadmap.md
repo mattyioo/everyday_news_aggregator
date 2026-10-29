@@ -86,7 +86,7 @@ Nicer to use.
 |---|---|
 | ~~scheduled-runs~~ – dropped: refresh only on launch (see decisions) | ❌ |
 | 0017-bbc-host-alias – same BBC article on bbc.com and bbc.co.uk is one article | ✅ archived |
-| 0018-web-view – local page for browsing digests | ⏳ |
+| 0018-web-view – local page for browsing digests | ✅ archived |
 | feedback-loop – mark items as noise/useful to tune filters | ⏳ |
 
 **Exit:** one `news run` on launch gives a tuned, readable digest.

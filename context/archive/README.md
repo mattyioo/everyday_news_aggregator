@@ -22,3 +22,4 @@ Finished changes, moved here from `context/change/`. Not edited after archiving.
 | 0015-whats-new | 4 | 2026-10-29 | 🆕/🔄 markers since the last digest (by fetch time), new first per site, story ids |
 | 0016-followed-topics | 4 | 2026-10-29 | Follow stories (`news follow`) and topics (`follow.toml`); Following section shows only updates |
 | 0017-bbc-host-alias | 5 | 2026-10-29 | bbc.com = bbc.co.uk in canonical URLs; primary prefers text; borrowed HN discussion link |
+| 0018-web-view | 5 | 2026-10-29 | `news web`: fetch once, then browse digests at 127.0.0.1:8765 |

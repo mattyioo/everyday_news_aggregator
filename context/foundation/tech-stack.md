@@ -16,6 +16,7 @@
 | Tests | `pytest` | Standard |
 | Lint/format | `ruff` | One tool for both |
 | Output | Markdown digest files | Decision Q3 |
+| Web view | stdlib `http.server` + `markdown-it-py` | Local only, no web framework needed |
 | Scheduling | none: fetch once when the app is launched | Decision: no background or scheduled requests |
 
 ## Sources

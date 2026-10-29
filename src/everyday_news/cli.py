@@ -1,5 +1,6 @@
 """Command-line entry point: `news fetch`, `news digest`, `news run`, `news sources`,
-`news stories`, `news top`, `news follow`, `news unfollow`, `news following`."""
+`news stories`, `news top`, `news follow`, `news unfollow`, `news following`,
+`news web`."""
 
 from datetime import UTC, datetime
 from pathlib import Path
@@ -287,3 +288,49 @@ def following(
         updated = s.newest.astimezone().strftime("%Y-%m-%d %H:%M")
         typer.echo(f"  #{s.id:<5} {s.lead.title}  (updated {updated})")
     typer.echo(f"topics: {', '.join(topics) if topics else 'none (edit follow.toml)'}")
+
+
+@app.command()
+def web(
+    port: Annotated[int, typer.Option(help="Local port")] = 8765,
+    no_fetch: Annotated[
+        bool, typer.Option("--no-fetch", help="Show stored digests without fetching first")
+    ] = False,
+    no_open: Annotated[bool, typer.Option("--no-open", help="Don't open the browser")] = False,
+    config: ConfigOption = DEFAULT_PATH,
+    settings_path: SettingsOption = cfg.DEFAULT_PATH,
+    filters_path: FiltersOption = Path("filters.toml"),
+    follow_path: FollowOption = fol.DEFAULT_PATH,
+    db_path: DbOption = db.DEFAULT_PATH,
+    out: OutOption = DEFAULT_DIR,
+) -> None:
+    """Open the app in the browser: fetch once and write the digest, then serve it locally."""
+    import webbrowser
+
+    from everyday_news.webview import HOST, serve
+
+    if not no_fetch:
+        run(
+            config=config,
+            settings_path=settings_path,
+            filters_path=filters_path,
+            follow_path=follow_path,
+            db_path=db_path,
+            out=out,
+        )
+    try:
+        server = serve(out, port)
+    except OSError as e:
+        typer.echo(f"error: cannot listen on {HOST}:{port}: {e.strerror}", err=True)
+        raise typer.Exit(1) from None
+
+    url = f"http://{HOST}:{port}/"
+    typer.echo(f"serving {url}  (Ctrl+C to stop; no further fetching while open)")
+    if not no_open:
+        webbrowser.open(url)
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        typer.echo("stopped")
+    finally:
+        server.server_close()

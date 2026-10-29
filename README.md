@@ -16,6 +16,7 @@ python3 -m venv .venv
 ## Usage
 
 ```sh
+.venv/bin/uv run news web      # open the app in the browser (fetches once, then serves 127.0.0.1:8765)
 .venv/bin/uv run news --help
 .venv/bin/uv run news sources  # list feeds from sources.toml
 .venv/bin/uv run news stories  # same-event stories covered by several articles

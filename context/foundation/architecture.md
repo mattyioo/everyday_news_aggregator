@@ -23,7 +23,8 @@ sources.toml ──► Fetch ──► Normalize ──► Dedupe/Cluster ──
 | **Digest** | `news digest` → `digests/YYYY-MM-DD.md` (local date): one section per enabled site in `sources.toml` order, story under its lead article's site with other coverage nested, ≤ `stories_per_site` (10) each, local times (no topic categories); ends with "Filtered out": dropped articles by reason with links + downrank tally |
 | **Prune** | At launch, delete articles not seen in their feed for `retention_days` (7) |
 | **Tracking** *(Phase 4)* | `digest_run` records each digest; baseline = last digest before the latest fetch; stories marked 🆕 new / 🔄 updated by fetch time and listed first per site. Followed stories (`news follow <id>`, DB) and topics (`follow.toml`): a "Following" section on top lists only what arrived since the last digest; followed stories get a 30-day clustering window and are exempt from retention |
-| **CLI** | `news run` (fetch + digest), `news fetch`, `news digest`, `news sources`, `news stories`, `news top`, `news follow <id>`, `news unfollow <id>`, `news following` |
+| **Web view** | `news web`: one `news run`, then serves `digests/` on 127.0.0.1 (`/`, `/d/YYYY-MM-DD`, `/archive`), Markdown → HTML via markdown-it-py with raw HTML off; no fetching while open |
+| **CLI** | `news run` (fetch + digest), `news fetch`, `news digest`, `news sources`, `news stories`, `news top`, `news follow <id>`, `news unfollow <id>`, `news following`, `news web` |
 
 ## Data model
 
