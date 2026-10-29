@@ -29,3 +29,4 @@ Need answers before the change that depends on them.
 | 2026-10-29 | Fetch cooldown 15 min per source; 60 min after a failed fetch. `--force` skips the cooldown only | Relaunching must not resend requests; failing sites get extra quiet time |
 | 2026-10-29 | HTTP client never follows redirects; feed URLs must be the final URL | A redirect doubles the requests |
 | 2026-10-29 | Reddit r/technology dropped (unauthenticated feed rate-limited too hard); replaced by BBC News World | User choice from BBC / Ars Technica / Guardian / Lobsters |
+| 2026-10-29 | English and Polish stories are grouped separately; no cross-language matching | User confirmed; matching across languages would need translation or an LLM |

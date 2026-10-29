@@ -35,13 +35,13 @@ Get articles from my sources into a local database.
 **Exit:** `news fetch` pulls all configured feeds into SQLite without errors.
 _Met 2026-10-29 for HN, BBC, WP.pl, znosnenewsy.pl. Reddit could not meet it (rate-limited) and was replaced in 0005._
 
-## Phase 2 – Noise Removal
+## Phase 2 – Noise Removal 🔄
 
 Turn a pile of articles into a short list of real stories.
 
 | Change | Status |
 |---|---|
-| 0006-exact-dedupe – same canonical URL or same title hash | ⏳ |
+| 0006-exact-dedupe – same canonical URL or same title hash | ✅ archived |
 | 0007-story-clustering – group same-event articles into stories (fuzzy titles, per language) | ⏳ |
 | 0008-rule-filters – muted topics, EN + PL clickbait patterns, with reasons | ⏳ |
 | 0009-heuristic-scoring – rank by source weight, recency, coverage | ⏳ |

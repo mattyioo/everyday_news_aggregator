@@ -8,6 +8,7 @@
 - No network calls in tests; use saved feed fixtures in `tests/fixtures/`.
 - `ruff check` and `pytest` must pass before a change moves to **Verify**.
 - Run tools through the venv: `.venv/bin/uv run <cmd>`. Keep `uv` in the `dev` group so `uv sync` doesn't uninstall it.
+- Database schema changes: append to `MIGRATIONS` in `db.py`, never edit an existing entry.
 - One git commit per change, made when it is archived. Message: `NNNN: <change title>`.
 
 ## Secrets

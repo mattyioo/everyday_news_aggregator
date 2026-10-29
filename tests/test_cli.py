@@ -25,5 +25,5 @@ def test_run_calls_fetch_and_digest(tmp_path: Path) -> None:
     result = runner.invoke(app, ["run", "--config", str(config), "--db", str(tmp_path / "news.db")])
     assert result.exit_code == 0, result.output
     assert "x  skipped  disabled" in result.output
-    assert "0 request(s) sent, 0 new article(s)" in result.output
+    assert "0 request(s) sent, 0 new article(s), 0 duplicate(s)" in result.output
     assert "digest:" in result.output

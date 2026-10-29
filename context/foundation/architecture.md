@@ -17,7 +17,7 @@ sources.toml ──► Fetch ──► Normalize ──► Dedupe/Cluster ──
 | **Sources** | User-edited config listing feeds (RSS/Atom), with language, tags, weight and a `fetch_fulltext` flag |
 | **Fetch** | Runs once per app launch, never in the background. One request per enabled feed, sequential, honest User-Agent, conditional GET (ETag / Last-Modified), timeouts, no retry loops, 15 min cooldown per source (60 min after a failure), skip a source for the run on 429/5xx/timeout, never follow redirects. Stores raw items |
 | **Normalize** | Turn raw items into one `Article` shape (title, url, source, lang, published, text) |
-| **Dedupe/Cluster** | Drop exact duplicates (URL/hash); group articles about the same event into a `Story` by fuzzy title match, within one language |
+| **Dedupe/Cluster** | Mark exact duplicates (same canonical URL, or same title hash + lang) and keep the highest-weight source as primary; group articles about the same event into a `Story` by fuzzy title match, within one language |
 | **Filter/Score** | Rule-based only: muted topics, per-language clickbait patterns, heuristic score (source weight, recency, number of sources covering it). Every decision records a reason |
 | **Summarize** | Extractive, no LLM: feed description, or the first sentences of the article text |
 | **Digest** | Render the day's top stories to Markdown (later: HTML / web view) |
@@ -33,7 +33,9 @@ Built (Phase 1):
 
 - `fetch_state` – source_id, last_fetched_at, last_status, etag, last_modified
 - `raw_item` – id, source_id, guid, url, title, summary (HTML), comments_url, published, fetched_at; unique (source_id, guid)
-- `article` – id, raw_item_id (unique), source_id, lang, url (canonical, tracking params removed), discussion_url (HN / Reddit thread), title, text (plain), published_at (UTC ISO), title_hash
+- `article` – id, raw_item_id (unique), source_id, lang, url (canonical, tracking params removed), discussion_url (HN / Reddit thread), title, text (plain), published_at (UTC ISO), title_hash, duplicate_of (Phase 2: NULL = shown; else the primary article's id)
+
+Schema changes to an existing `news.db` go through `MIGRATIONS` in `db.py` (tracked by `PRAGMA user_version`); never edit a committed migration.
 
 Planned:
 

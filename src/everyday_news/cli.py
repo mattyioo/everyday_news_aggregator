@@ -6,6 +6,7 @@ from typing import Annotated
 import typer
 
 from everyday_news import db
+from everyday_news.dedupe import mark_duplicates
 from everyday_news.fetch import fetch_all, make_client
 from everyday_news.normalize import normalize_pending
 from everyday_news.sources import DEFAULT_PATH, Source, SourceConfigError, load_sources
@@ -39,6 +40,7 @@ def fetch(
         with make_client() as client:
             results = fetch_all(sources, conn, client, force=force)
         added = normalize_pending(conn, sources)
+        duplicates = mark_duplicates(conn, sources)
     finally:
         conn.close()
 
@@ -46,7 +48,7 @@ def fetch(
     for r in results:
         typer.echo(f"{r.source_id:<{width}}  {r.status:<7}  {r.detail}")
     requests = sum(r.requested for r in results)
-    typer.echo(f"{requests} request(s) sent, {added} new article(s)")
+    typer.echo(f"{requests} request(s) sent, {added} new article(s), {duplicates} duplicate(s)")
 
 
 @app.command()
