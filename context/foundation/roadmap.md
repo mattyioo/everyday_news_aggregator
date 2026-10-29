@@ -52,13 +52,13 @@ Turn a pile of articles into a short list of real stories.
 
 **Exit:** a day's articles reduce to a ranked story list; every drop has a reason.
 
-## Phase 3 – Digest
+## Phase 3 – Digest 🔄
 
 Something to actually read.
 
 | Change | Status |
 |---|---|
-| summaries – extractive per-story summary (feed description / lead sentences) | ⏳ |
+| 0011-summaries – extractive per-story summary (feed description / lead sentences) | ✅ archived |
 | markdown-digest – `digests/YYYY-MM-DD.md`, one section per site | ⏳ |
 | filtered-report – "what was dropped and why" section | ⏳ |
 

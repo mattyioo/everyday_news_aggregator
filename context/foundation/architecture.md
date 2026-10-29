@@ -19,7 +19,7 @@ sources.toml ──► Fetch ──► Normalize ──► Dedupe/Cluster ──
 | **Normalize** | Turn raw items into one `Article` shape (title, url, source, lang, published, text) |
 | **Dedupe/Cluster** | Mark exact duplicates (same canonical URL, or same title hash + lang) and keep the highest-weight source as primary; group articles about the same event into a `Story` (shared key words in titles, or overlapping lead text; same language; rolling 3-day window; story ids stable) |
 | **Filter/Score** | Rule-based only, from user-editable `filters.toml`: muted words (drop), per-language headline regexes (drop or downrank), heuristic score computed on demand in `rank.py`: highest source weight × recency (24 h half-life) × coverage (+0.5 per extra site, +0.25 per extra article) × 0.5 if fully downranked. Lead article: not downranked > weight > has text > earliest. Every decision records a reason |
-| **Summarize** | Extractive, no LLM: feed description, or the first sentences of the article text |
+| **Summarize** | Extractive, no LLM (`summarize.py`): whole sentences of the lead text up to 280 chars, abbreviation-aware, truncated feed excerpts trimmed to the last full sentence; HN items have none |
 | **Digest** | Render the day's top stories to Markdown, one section per site (no topic categories) |
 | **Prune** | At launch, delete articles not seen in their feed for `retention_days` (7) |
 | **Tracking** *(Phase 4)* | Followed topics; show what is new since the last digest |
