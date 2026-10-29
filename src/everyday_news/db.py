@@ -53,6 +53,21 @@ MIGRATIONS = [
     # 2 (0008): when an item was last present in its feed, for retention
     "ALTER TABLE raw_item ADD COLUMN last_seen_at TEXT;"
     " UPDATE raw_item SET last_seen_at = fetched_at;",
+    # 3 (0007): same-event articles grouped into stories
+    """
+    CREATE TABLE story (
+        id           INTEGER PRIMARY KEY,
+        lang         TEXT NOT NULL,
+        title        TEXT NOT NULL,
+        first_seen   TEXT NOT NULL,
+        last_updated TEXT NOT NULL
+    );
+    CREATE TABLE story_article (
+        story_id   INTEGER NOT NULL REFERENCES story (id),
+        article_id INTEGER NOT NULL UNIQUE REFERENCES article (id)
+    );
+    CREATE INDEX story_article_story ON story_article (story_id);
+    """,
 ]
 
 

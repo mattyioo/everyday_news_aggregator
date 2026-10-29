@@ -17,7 +17,7 @@ sources.toml ──► Fetch ──► Normalize ──► Dedupe/Cluster ──
 | **Sources** | User-edited config listing feeds (RSS/Atom), with language, tags, weight and a `fetch_fulltext` flag |
 | **Fetch** | Runs once per app launch, never in the background. One request per enabled feed, sequential, honest User-Agent, conditional GET (ETag / Last-Modified), timeouts, no retry loops, 15 min cooldown per source (60 min after a failure), skip a source for the run on 429/5xx/timeout, never follow redirects. Stores raw items |
 | **Normalize** | Turn raw items into one `Article` shape (title, url, source, lang, published, text) |
-| **Dedupe/Cluster** | Mark exact duplicates (same canonical URL, or same title hash + lang) and keep the highest-weight source as primary; group articles about the same event into a `Story` by fuzzy title match, within one language |
+| **Dedupe/Cluster** | Mark exact duplicates (same canonical URL, or same title hash + lang) and keep the highest-weight source as primary; group articles about the same event into a `Story` (shared key words in titles, or overlapping lead text; same language; rolling 3-day window; story ids stable) |
 | **Filter/Score** | Rule-based only: muted topics, per-language clickbait patterns, heuristic score (source weight, recency, number of sources covering it). Every decision records a reason |
 | **Summarize** | Extractive, no LLM: feed description, or the first sentences of the article text |
 | **Digest** | Render the day's top stories to Markdown, one section per site (no topic categories) |
@@ -38,10 +38,11 @@ Built (Phase 1):
 
 Schema changes to an existing `news.db` go through `MIGRATIONS` in `db.py` (tracked by `PRAGMA user_version`); never edit a committed migration.
 
+- `story` – id, lang, title (from the highest-weight source), first_seen, last_updated
+- `story_article` – story_id, article_id (unique); only primary (non-duplicate) articles
+
 Planned:
 
-- `story` – id, title, first_seen, last_updated
-- `story_article` – story_id, article_id
 - `verdict` – article_id or story_id, kept (bool), score, reason
 
 ## Boundaries

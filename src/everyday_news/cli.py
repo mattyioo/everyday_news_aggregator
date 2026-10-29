@@ -1,4 +1,5 @@
-"""Command-line entry point: `news fetch`, `news digest`, `news run`, `news sources`."""
+"""Command-line entry point: `news fetch`, `news digest`, `news run`, `news sources`,
+`news stories`."""
 
 from datetime import UTC, datetime
 from pathlib import Path
@@ -8,6 +9,7 @@ import typer
 
 from everyday_news import db
 from everyday_news import settings as cfg
+from everyday_news.cluster import cluster
 from everyday_news.dedupe import mark_duplicates
 from everyday_news.fetch import fetch_all, make_client
 from everyday_news.normalize import normalize_pending
@@ -56,6 +58,8 @@ def fetch(
         deleted = prune(conn, sources, settings.retention_days, datetime.now(UTC))
         added = normalize_pending(conn, sources)
         duplicates = mark_duplicates(conn, sources)
+        cluster(conn, sources)
+        stories = conn.execute("SELECT COUNT(*) FROM story").fetchone()[0]
     finally:
         conn.close()
 
@@ -65,7 +69,7 @@ def fetch(
     requests = sum(r.requested for r in results)
     typer.echo(
         f"{requests} request(s) sent, {added} new article(s), {duplicates} duplicate(s), "
-        f"{deleted} deleted (older than {settings.retention_days} days)"
+        f"{deleted} deleted (older than {settings.retention_days} days), {stories} stories"
     )
 
 
@@ -92,3 +96,34 @@ def sources(config: ConfigOption = DEFAULT_PATH) -> None:
     for s in _load(config):
         state = "on " if s.enabled else "off"
         typer.echo(f"[{state}] {s.id:<18} {s.lang}  w={s.weight:<4} {s.name}  {s.url}")
+
+
+@app.command()
+def stories(db_path: DbOption = db.DEFAULT_PATH) -> None:
+    """List stories covered by more than one article (no network)."""
+    conn = db.connect(db_path)
+    try:
+        rows = conn.execute(
+            """
+            SELECT story.id, story.lang, story.title, story.last_updated,
+                   article.source_id, article.title AS article_title
+            FROM story
+            JOIN story_article ON story_article.story_id = story.id
+            JOIN article ON article.id = story_article.article_id
+            WHERE story.id IN (
+                SELECT story_id FROM story_article GROUP BY story_id HAVING COUNT(*) > 1
+            )
+            ORDER BY story.last_updated DESC, story.id, article.published_at
+            """
+        ).fetchall()
+    finally:
+        conn.close()
+
+    if not rows:
+        typer.echo("no stories with more than one article")
+    current = None
+    for r in rows:
+        if r["id"] != current:
+            current = r["id"]
+            typer.echo(f"\n[{r['lang']}] {r['title']}  (updated {r['last_updated'][:16]})")
+        typer.echo(f"    {r['source_id']:<12} {r['article_title']}")

@@ -11,7 +11,7 @@
 | Storage | SQLite (stdlib `sqlite3`) | Local, zero setup, easy to inspect |
 | Config | `sources.toml`, `settings.toml` (stdlib `tomllib`) | Human-editable |
 | CLI | `typer` | Simple commands with help text |
-| Similarity | `rapidfuzz` | Fast fuzzy title matching for clustering, no ML |
+| Similarity | stdlib only: key-word sets (stopwords, 5-letter prefix stems) | Tuned on real data; no extra dependency |
 | LLM | **none** | Decision Q2 |
 | Tests | `pytest` | Standard |
 | Lint/format | `ruff` | One tool for both |

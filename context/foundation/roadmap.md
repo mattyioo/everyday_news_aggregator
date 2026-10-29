@@ -45,7 +45,7 @@ Turn a pile of articles into a short list of real stories.
 | Change | Status |
 |---|---|
 | 0006-exact-dedupe – same canonical URL or same title hash | ✅ archived |
-| 0007-story-clustering – group same-event articles into stories (fuzzy titles, per language) | 🔄 Propose |
+| 0007-story-clustering – group same-event articles into stories (fuzzy titles, per language) | ✅ archived |
 | 0008-retention – delete articles 30 days after they leave their feed | ✅ archived |
 | rule-filters – muted topics, EN + PL clickbait patterns, with reasons | ⏳ |
 | heuristic-scoring – rank by source weight, recency, coverage | ⏳ |

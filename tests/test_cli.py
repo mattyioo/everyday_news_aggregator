@@ -39,4 +39,5 @@ def test_run_calls_fetch_and_digest(tmp_path: Path) -> None:
     assert result.exit_code == 0, result.output
     assert "x  skipped  disabled" in result.output
     assert "0 request(s) sent, 0 new article(s), 0 duplicate(s), 0 deleted" in result.output
+    assert "0 stories" in result.output
     assert "digest:" in result.output
