@@ -78,6 +78,9 @@ MIGRATIONS = [
     """,
     # 5 (0015): when digests were written, to mark what is new since the last one
     "CREATE TABLE digest_run (id INTEGER PRIMARY KEY, generated_at TEXT NOT NULL);",
+    # 6 (0016): stories the reader follows
+    "CREATE TABLE followed_story ("
+    " story_id INTEGER PRIMARY KEY REFERENCES story (id), followed_at TEXT NOT NULL);",
 ]
 
 

@@ -20,3 +20,4 @@ Finished changes, moved here from `context/change/`. Not edited after archiving.
 | 0013-filtered-report | 3 | 2026-10-29 | Digest ends with dropped articles by reason (links) and a downrank tally |
 | 0014-per-site-window | 4 | 2026-10-29 | Optional per-source `digest_hours`; Znośne Newsy 7 days |
 | 0015-whats-new | 4 | 2026-10-29 | 🆕/🔄 markers since the last digest (by fetch time), new first per site, story ids |
+| 0016-followed-topics | 4 | 2026-10-29 | Follow stories (`news follow`) and topics (`follow.toml`); Following section shows only updates |

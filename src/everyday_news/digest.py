@@ -2,9 +2,11 @@
 
 import re
 from collections import Counter
+from dataclasses import dataclass
 from datetime import datetime, tzinfo
 from pathlib import Path
 
+from everyday_news.keywords import find_keyword
 from everyday_news.rank import Item, RankedStory, Ranking
 from everyday_news.settings import Settings
 from everyday_news.sources import Source
@@ -34,6 +36,13 @@ def _discussion(item: Item) -> str:
 
 
 BADGES = {"new": "🆕 ", "updated": "🔄 "}
+MAX_UPDATES = 5
+
+
+@dataclass(frozen=True)
+class Following:
+    stories: tuple[RankedStory, ...] = ()  # followed stories, any age
+    topics: tuple[str, ...] = ()  # followed words (follow.toml)
 
 
 def story_status(story: RankedStory, since: datetime | None) -> str | None:
@@ -87,24 +96,31 @@ def render_digest(
     now: datetime,
     tz: tzinfo | None = None,
     since: datetime | None = None,
+    following: Following | None = None,
 ) -> str:
     """Markdown for the whole digest. `tz=None` uses the machine's local timezone;
     `since` (the previous visit, see visits.baseline) enables new/updated markers."""
     names = {s.id: s.name for s in sources}
+    following_lines, shown = _following_section(
+        ranking, following or Following(), names, now, tz, since
+    )
     by_site: dict[str, list[RankedStory]] = {}
+    sites_with_stories: set[str] = set()
     for story in ranking.stories:
-        by_site.setdefault(story.lead.source_id, []).append(story)
+        sites_with_stories.add(story.lead.source_id)
+        if story.id not in shown:  # already under "Following": no repeats
+            by_site.setdefault(story.lead.source_id, []).append(story)
 
     # Configured sites in sources.toml order, then any leftovers (removed sources)
     site_ids = [s.id for s in sources if s.enabled]
-    site_ids += sorted(set(by_site) - set(site_ids))
+    site_ids += sorted(sites_with_stories - set(site_ids))
 
     local_now = now.astimezone(tz)
     out = [
         f"# Everyday News – {local_now:%Y-%m-%d}",
         "",
         f"_Generated {local_now:%H:%M} · last {settings.digest_hours} h · "
-        f"{len(ranking.stories)} stories from {len(by_site)} sites · "
+        f"{len(ranking.stories)} stories from {len(sites_with_stories)} sites · "
         f"{len(ranking.dropped)} filtered out_",
     ]
     longer = [
@@ -123,6 +139,7 @@ def render_digest(
             f"_{statuses.count('new')} new · {statuses.count('updated')} updated "
             f"since your last digest ({_when(since, now, tz)})_",
         ]
+    out += following_lines
     for site_id in site_ids:
         stories = by_site.get(site_id, [])
         out += ["", f"## {escape(names.get(site_id, site_id))} ({len(stories)})", ""]
@@ -137,6 +154,57 @@ def render_digest(
             out += ["", f"_+ {len(stories) - len(shown)} more stories not shown_"]
     out += _filtered_section(ranking, names, now, tz)
     return "\n".join(out) + "\n"
+
+
+def _following_section(
+    ranking: Ranking,
+    following: Following,
+    names: dict[str, str],
+    now: datetime,
+    tz: tzinfo | None,
+    since: datetime | None,
+) -> tuple[list[str], set[int]]:
+    """Followed stories (only their updates) and topic matches; returns the lines and
+    the ids of stories shown here, which the site sections then skip."""
+    if not following.stories and not following.topics:
+        return [], set()
+
+    out = ["", "## Following", ""]
+    shown: set[int] = set()
+    for story in following.stories:
+        shown.add(story.id)
+        lead = story.lead
+        out.append(f"- 📌 **[{escape(lead.title)}]({lead.url})** · \\#{story.id}")
+        if since is None:
+            out.append("  _first digest: updates will show from the next one_")
+            continue
+        updates = sorted((i for i in story.items if i.fetched > since), key=lambda i: i.published)
+        if not updates:
+            out.append("  _no updates since your last digest_")
+        for item in updates[:MAX_UPDATES]:
+            site = escape(names.get(item.source_id, item.source_id))
+            out.append(
+                f"  - [{escape(item.title)}]({item.url}) · {site}"
+                f" · {_when(item.published, now, tz)}{_discussion(item)}"
+            )
+        if len(updates) > MAX_UPDATES:
+            out.append(f"  - + {len(updates) - MAX_UPDATES} more updates")
+
+    for topic in following.topics:
+        matches = [
+            s
+            for s in ranking.stories
+            if s.id not in shown
+            and (since is None or story_status(s, since) is not None)
+            and any(find_keyword(f"{i.title} {i.text}", (topic,)) for i in s.items)
+        ]
+        out += ["", f"**Topic: {escape(topic)}** ({len(matches)})", ""]
+        if not matches:
+            out.append("_nothing new_")
+        for s in matches:
+            shown.add(s.id)
+            out.append(_entry(s, names, now, tz, since))
+    return out, shown
 
 
 def _filtered_section(

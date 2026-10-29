@@ -35,6 +35,8 @@ def test_run_calls_fetch_and_digest(tmp_path: Path) -> None:
             str(settings),
             "--filters",
             str(ROOT / "filters.toml"),
+            "--follow",
+            str(ROOT / "follow.toml"),
             "--db",
             str(tmp_path / "x.db"),
             "--out",

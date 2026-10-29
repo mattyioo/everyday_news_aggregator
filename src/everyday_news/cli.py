@@ -1,5 +1,5 @@
 """Command-line entry point: `news fetch`, `news digest`, `news run`, `news sources`,
-`news stories`, `news top`."""
+`news stories`, `news top`, `news follow`, `news unfollow`, `news following`."""
 
 from datetime import UTC, datetime
 from pathlib import Path
@@ -8,15 +8,22 @@ from typing import Annotated
 import typer
 
 from everyday_news import db
+from everyday_news import follow as fol
 from everyday_news import settings as cfg
 from everyday_news.cluster import cluster
 from everyday_news.dedupe import mark_duplicates
-from everyday_news.digest import DEFAULT_DIR, digest_path, render_digest, write_digest
+from everyday_news.digest import (
+    DEFAULT_DIR,
+    Following,
+    digest_path,
+    render_digest,
+    write_digest,
+)
 from everyday_news.fetch import fetch_all, make_client
 from everyday_news.filters import FilterConfigError, Filters, apply_filters, load_filters
 from everyday_news.normalize import normalize_pending
 from everyday_news.prune import prune
-from everyday_news.rank import rank_stories
+from everyday_news.rank import rank_stories, stories_by_id
 from everyday_news.sources import DEFAULT_PATH, Source, SourceConfigError, load_sources
 from everyday_news.visits import baseline, record_digest
 
@@ -91,25 +98,37 @@ def fetch(
 
 
 OutOption = Annotated[Path, typer.Option("--out", help="Directory for digest files")]
+FollowOption = Annotated[Path, typer.Option("--follow", help="Path to follow.toml")]
 
 
 @app.command()
 def digest(
     config: ConfigOption = DEFAULT_PATH,
     settings_path: SettingsOption = cfg.DEFAULT_PATH,
+    follow_path: FollowOption = fol.DEFAULT_PATH,
     db_path: DbOption = db.DEFAULT_PATH,
     out: OutOption = DEFAULT_DIR,
 ) -> None:
     """Write today's Markdown digest from stored stories (no network)."""
     sources = _load(config)
     settings = _load_settings(settings_path)
+    try:
+        topics = fol.load_topics(follow_path)
+    except fol.FollowError as e:
+        typer.echo(f"error: {e}", err=True)
+        raise typer.Exit(1) from None
     now = datetime.now(UTC)
     conn = db.connect(db_path)
     try:
         ranking = rank_stories(conn, sources, now, settings.digest_hours)
+        following = Following(
+            stories=tuple(stories_by_id(conn, sources, now, fol.followed_ids(conn))),
+            topics=topics,
+        )
         since = baseline(conn)
         path = digest_path(now, out)
-        write_digest(render_digest(ranking, sources, settings, now, since=since), path)
+        markdown = render_digest(ranking, sources, settings, now, since=since, following=following)
+        write_digest(markdown, path)
         record_digest(conn, now)
     finally:
         conn.close()
@@ -121,6 +140,7 @@ def run(
     config: ConfigOption = DEFAULT_PATH,
     settings_path: SettingsOption = cfg.DEFAULT_PATH,
     filters_path: FiltersOption = Path("filters.toml"),
+    follow_path: FollowOption = fol.DEFAULT_PATH,
     db_path: DbOption = db.DEFAULT_PATH,
     out: OutOption = DEFAULT_DIR,
 ) -> None:
@@ -132,7 +152,13 @@ def run(
         filters_path=filters_path,
         db_path=db_path,
     )
-    digest(config=config, settings_path=settings_path, db_path=db_path, out=out)
+    digest(
+        config=config,
+        settings_path=settings_path,
+        follow_path=follow_path,
+        db_path=db_path,
+        out=out,
+    )
 
 
 @app.command()
@@ -170,7 +196,9 @@ def stories(db_path: DbOption = db.DEFAULT_PATH) -> None:
     for r in rows:
         if r["id"] != current:
             current = r["id"]
-            typer.echo(f"\n[{r['lang']}] {r['title']}  (updated {r['last_updated'][:16]})")
+            typer.echo(
+                f"\n#{r['id']} [{r['lang']}] {r['title']}  (updated {r['last_updated'][:16]})"
+            )
         typer.echo(f"    {r['source_id']:<12} {r['article_title']}")
 
 
@@ -195,5 +223,66 @@ def top(
         note = f"  [downranked: {s.downranked}]" if s.downranked else ""
         typer.echo(
             f"{n:>3}. {s.score:.2f} (w {s.weight:.1f} × r {s.recency:.2f} × c {s.coverage:.2f})"
-            f"  {s.lead.source_id:<11} {s.lead.title}{note}"
+            f"  #{s.id:<5} {s.lead.source_id:<11} {s.lead.title}{note}"
         )
+
+
+StoryId = Annotated[int, typer.Argument(help="Story id, shown as #123 in the digest")]
+
+
+@app.command()
+def follow(
+    story_id: StoryId, config: ConfigOption = DEFAULT_PATH, db_path: DbOption = db.DEFAULT_PATH
+) -> None:
+    """Follow a story: later digests list its updates at the top."""
+    sources = _load(config)
+    now = datetime.now(UTC)
+    conn = db.connect(db_path)
+    try:
+        title = fol.follow_story(conn, story_id, now)
+        # Show the same lead headline as the digest (the stored title can be a video)
+        leads = stories_by_id(conn, sources, now, [story_id])
+    except fol.FollowError as e:
+        typer.echo(f"error: {e}", err=True)
+        raise typer.Exit(1) from None
+    finally:
+        conn.close()
+    typer.echo(f"following #{story_id}: {leads[0].lead.title if leads else title}")
+
+
+@app.command()
+def unfollow(story_id: StoryId, db_path: DbOption = db.DEFAULT_PATH) -> None:
+    """Stop following a story."""
+    conn = db.connect(db_path)
+    try:
+        removed = fol.unfollow_story(conn, story_id)
+    finally:
+        conn.close()
+    typer.echo(f"unfollowed #{story_id}" if removed else f"#{story_id} was not followed")
+
+
+@app.command()
+def following(
+    config: ConfigOption = DEFAULT_PATH,
+    follow_path: FollowOption = fol.DEFAULT_PATH,
+    db_path: DbOption = db.DEFAULT_PATH,
+) -> None:
+    """List followed stories and topics."""
+    sources = _load(config)
+    now = datetime.now(UTC)
+    conn = db.connect(db_path)
+    try:
+        stories = stories_by_id(conn, sources, now, fol.followed_ids(conn))
+    finally:
+        conn.close()
+    try:
+        topics = fol.load_topics(follow_path)
+    except fol.FollowError as e:
+        typer.echo(f"error: {e}", err=True)
+        raise typer.Exit(1) from None
+
+    typer.echo("stories:" if stories else "stories: none (news follow <id>)")
+    for s in stories:
+        updated = s.newest.astimezone().strftime("%Y-%m-%d %H:%M")
+        typer.echo(f"  #{s.id:<5} {s.lead.title}  (updated {updated})")
+    typer.echo(f"topics: {', '.join(topics) if topics else 'none (edit follow.toml)'}")

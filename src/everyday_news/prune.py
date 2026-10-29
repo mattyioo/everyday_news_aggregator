@@ -13,9 +13,16 @@ from everyday_news.sources import Source
 def prune(
     conn: sqlite3.Connection, sources: list[Source], retention_days: int, now: datetime
 ) -> int:
-    """Delete everything unseen for `retention_days`. Returns how many articles went."""
+    """Delete everything unseen for `retention_days`, except articles of followed
+    stories. Returns how many articles went."""
     cutoff = (now - timedelta(days=retention_days)).isoformat()
-    stale = "SELECT id FROM raw_item WHERE last_seen_at < ?"
+    stale = """
+        SELECT id FROM raw_item WHERE last_seen_at < ? AND id NOT IN (
+            SELECT article.raw_item_id FROM article
+            JOIN story_article ON story_article.article_id = article.id
+            JOIN followed_story ON followed_story.story_id = story_article.story_id
+        )
+    """
 
     deleted = conn.execute(f"DELETE FROM article WHERE raw_item_id IN ({stale})", (cutoff,))
     conn.execute(f"DELETE FROM raw_item WHERE id IN ({stale})", (cutoff,))

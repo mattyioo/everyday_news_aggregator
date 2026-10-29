@@ -22,6 +22,7 @@ python3 -m venv .venv
 .venv/bin/uv run news run      # fetch once, then write digests/YYYY-MM-DD.md
 .venv/bin/uv run news digest   # rewrite today's digest from stored news (no network)
 .venv/bin/uv run news top      # ranked stories with score parts
+.venv/bin/uv run news follow 15 # follow story #15 (ids are in the digest); unfollow / following
 ```
 
 ## Development
@@ -32,6 +33,7 @@ python3 -m venv .venv
 ```
 
 Noise rules and muted words live in `filters.toml`.
+Topics to follow live in `follow.toml`.
 Feeds are configured in `sources.toml`; `settings.toml` sets how long news is kept
 (`retention_days`, currently 7 days after an article leaves its feed).
 

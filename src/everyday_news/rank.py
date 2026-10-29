@@ -70,6 +70,39 @@ def rank_stories(
     def in_window(i: Item) -> bool:
         return i.published >= now - windows.get(i.source_id, default_window)
 
+    by_story = _load_items(conn)
+    stories = []
+    dropped = []
+    for story_id, (lang, items) in by_story.items():
+        dropped += [i for i in items if i.action == "drop" and in_window(i)]
+        kept = [i for i in items if i.action != "drop"]
+        if not any(in_window(i) for i in kept):
+            continue
+        stories.append(_score(story_id, lang, kept, weights, now))
+
+    stories.sort(key=lambda s: (-s.score, -s.newest.timestamp(), s.id))
+    dropped.sort(key=lambda i: (-i.published.timestamp(), i.id))
+    return Ranking(tuple(stories), tuple(dropped))
+
+
+def stories_by_id(
+    conn: sqlite3.Connection, sources: list[Source], now: datetime, ids: list[int]
+) -> list[RankedStory]:
+    """The given stories, scored but not limited by any window (for followed stories).
+    Stories that no longer exist or have only dropped articles are skipped."""
+    weights = {s.id: s.weight for s in sources}
+    by_story = _load_items(conn)
+    result = []
+    for story_id in ids:
+        lang, items = by_story.get(story_id, ("", []))
+        kept = [i for i in items if i.action != "drop"]
+        if kept:
+            result.append(_score(story_id, lang, kept, weights, now))
+    return result
+
+
+def _load_items(conn: sqlite3.Connection) -> dict[int, tuple[str, list[Item]]]:
+    """All story articles with their verdicts, grouped by story: {id: (lang, items)}."""
     by_story: dict[int, tuple[str, list[Item]]] = {}
     for row in conn.execute(
         """
@@ -96,18 +129,7 @@ def rank_stories(
         )
         by_story.setdefault(row["story_id"], (row["lang"], []))[1].append(item)
 
-    stories = []
-    dropped = []
-    for story_id, (lang, items) in by_story.items():
-        dropped += [i for i in items if i.action == "drop" and in_window(i)]
-        kept = [i for i in items if i.action != "drop"]
-        if not any(in_window(i) for i in kept):
-            continue
-        stories.append(_score(story_id, lang, kept, weights, now))
-
-    stories.sort(key=lambda s: (-s.score, -s.newest.timestamp(), s.id))
-    dropped.sort(key=lambda i: (-i.published.timestamp(), i.id))
-    return Ranking(tuple(stories), tuple(dropped))
+    return by_story
 
 
 def _score(

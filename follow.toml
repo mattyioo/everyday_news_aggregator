@@ -1,0 +1,10 @@
+# Topics to follow. Stories in the digest window that mention one of these words and
+# are new or updated since your last digest are listed at the top, under "Following".
+#
+# Same matching as muted words in filters.toml: case-insensitive; 4+ letters match the
+# start of a word ("ukrain" → Ukraina, Ukrainy, Ukrainian), shorter ones a whole word.
+# Pick stems short enough to cover Polish endings.
+#
+# Single stories are followed by id instead:  news follow 123  /  news unfollow 123
+
+topics = []

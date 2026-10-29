@@ -16,6 +16,7 @@ from datetime import datetime, timedelta
 from everyday_news.sources import Source
 
 WINDOW = timedelta(days=3)
+FOLLOWED_WINDOW = timedelta(days=30)  # followed stories may go quiet for a while
 STEM = 5
 TITLE_MIN = 0.3  # Jaccard of title key words, or...
 SHARED_MIN = 2  # ...this many shared title key words (names, places)...
@@ -105,6 +106,8 @@ def cluster(conn: sqlite3.Connection, sources: list[Source]) -> int:
         """
     )
     conn.execute("DELETE FROM story WHERE id NOT IN (SELECT story_id FROM story_article)")
+    conn.execute("DELETE FROM followed_story WHERE story_id NOT IN (SELECT id FROM story)")
+    followed = {r[0] for r in conn.execute("SELECT story_id FROM followed_story")}
 
     articles = {
         row["id"]: (row, _load(row))
@@ -128,7 +131,9 @@ def cluster(conn: sqlite3.Connection, sources: list[Source]) -> int:
         candidates = [
             (max(similarity(article, m) for m in s.members), s)
             for s in stories.values()
-            if s.lang == row["lang"] and abs(article.published - s.newest) <= WINDOW
+            if s.lang == row["lang"]
+            and abs(article.published - s.newest)
+            <= (FOLLOWED_WINDOW if s.id in followed else WINDOW)
         ]
         score, best = max(candidates, key=lambda c: c[0], default=(0.0, None))
         if best is None or score < 1.0:

@@ -9,7 +9,7 @@
 | HTTP | `httpx` | Timeouts, redirects, custom User-Agent |
 | Article text | `trafilatura` | Extracts main text from article pages |
 | Storage | SQLite (stdlib `sqlite3`) | Local, zero setup, easy to inspect |
-| Config | `sources.toml`, `settings.toml`, `filters.toml` (stdlib `tomllib`) | Human-editable |
+| Config | `sources.toml`, `settings.toml`, `filters.toml`, `follow.toml` (stdlib `tomllib`) | Human-editable |
 | CLI | `typer` | Simple commands with help text |
 | Similarity | stdlib only: key-word sets (stopwords, 5-letter prefix stems) | Tuned on real data; no extra dependency |
 | LLM | **none** | Decision Q2 |

@@ -11,12 +11,11 @@ import tomllib
 from dataclasses import dataclass
 from pathlib import Path
 
+from everyday_news.keywords import find_keyword, is_single_word
+
 DEFAULT_PATH = Path("filters.toml")
 ACTIONS = ("drop", "downrank")
 LANGS = ("en", "pl", "any")
-PREFIX_MIN = 4
-
-WORD = re.compile(r"\w+")
 
 
 class FilterConfigError(ValueError):
@@ -55,7 +54,7 @@ def load_filters(path: Path = DEFAULT_PATH) -> Filters:
     if not isinstance(muted, list) or not all(isinstance(m, str) for m in muted):
         raise FilterConfigError(f"{path}: muted must be a list of strings")
     for m in muted:
-        if not WORD.fullmatch(m):
+        if not is_single_word(m):
             raise FilterConfigError(f"{path}: muted word {m!r} must be a single word")
 
     rules = [_parse_rule(r, path, i) for i, r in enumerate(data.get("rule", []), start=1)]
@@ -80,10 +79,9 @@ def _parse_rule(entry: dict, path: Path, index: int) -> Rule:
 
 def evaluate(title: str, text: str, lang: str, filters: Filters) -> Verdict | None:
     """Return the verdict for one article, or None to keep it as is."""
-    for word in WORD.findall(f"{title} {text}".casefold()):
-        for m in filters.muted:
-            if word.startswith(m) if len(m) >= PREFIX_MIN else word == m:
-                return Verdict("drop", f"muted: {m}")
+    muted = find_keyword(f"{title} {text}", filters.muted)
+    if muted:
+        return Verdict("drop", f"muted: {muted}")
 
     matches = [r for r in filters.rules if r.lang in (lang, "any") and r.pattern.search(title)]
     for action in ACTIONS:
