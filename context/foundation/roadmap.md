@@ -32,6 +32,7 @@ Get articles from my sources into a local database.
 | 0004-normalize-and-store – `Article` model, SQLite schema | ✅ archived |
 
 **Exit:** `news fetch` pulls all configured feeds into SQLite without errors.
+_Met for HN, WP.pl and znosnenewsy.pl. Reddit was rate-limited (429) by development test requests on 2026-10-29; recheck on the next normal launch._
 
 ## Phase 2 – Noise Removal
 
