@@ -19,7 +19,9 @@ python3 -m venv .venv
 .venv/bin/uv run news --help
 .venv/bin/uv run news sources  # list feeds from sources.toml
 .venv/bin/uv run news stories  # same-event stories covered by several articles
-.venv/bin/uv run news run      # fetch + digest
+.venv/bin/uv run news run      # fetch once, then write digests/YYYY-MM-DD.md
+.venv/bin/uv run news digest   # rewrite today's digest from stored news (no network)
+.venv/bin/uv run news top      # ranked stories with score parts
 ```
 
 ## Development

@@ -59,7 +59,7 @@ Something to actually read.
 | Change | Status |
 |---|---|
 | 0011-summaries – extractive per-story summary (feed description / lead sentences) | ✅ archived |
-| markdown-digest – `digests/YYYY-MM-DD.md`, one section per site | ⏳ |
+| 0012-markdown-digest – `digests/YYYY-MM-DD.md`, one section per site | ✅ archived |
 | filtered-report – "what was dropped and why" section | ⏳ |
 
 **Exit:** `news run` produces a digest readable in under 10 minutes.

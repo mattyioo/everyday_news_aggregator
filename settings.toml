@@ -6,3 +6,6 @@ retention_days = 7
 
 # The digest covers stories with news from the last this-many hours.
 digest_hours = 24
+
+# At most this many stories per site in the digest (the rest is counted, not listed).
+stories_per_site = 10

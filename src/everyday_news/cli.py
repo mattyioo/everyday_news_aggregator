@@ -11,6 +11,7 @@ from everyday_news import db
 from everyday_news import settings as cfg
 from everyday_news.cluster import cluster
 from everyday_news.dedupe import mark_duplicates
+from everyday_news.digest import DEFAULT_DIR, digest_path, render_digest, write_digest
 from everyday_news.fetch import fetch_all, make_client
 from everyday_news.filters import FilterConfigError, Filters, apply_filters, load_filters
 from everyday_news.normalize import normalize_pending
@@ -88,10 +89,29 @@ def fetch(
     )
 
 
+OutOption = Annotated[Path, typer.Option("--out", help="Directory for digest files")]
+
+
 @app.command()
-def digest() -> None:
-    """Build today's Markdown digest from stored stories."""
-    typer.echo("digest: not implemented yet (markdown-digest change)")
+def digest(
+    config: ConfigOption = DEFAULT_PATH,
+    settings_path: SettingsOption = cfg.DEFAULT_PATH,
+    db_path: DbOption = db.DEFAULT_PATH,
+    out: OutOption = DEFAULT_DIR,
+) -> None:
+    """Write today's Markdown digest from stored stories (no network)."""
+    sources = _load(config)
+    settings = _load_settings(settings_path)
+    now = datetime.now(UTC)
+    conn = db.connect(db_path)
+    try:
+        ranking = rank_stories(conn, sources, now, settings.digest_hours)
+    finally:
+        conn.close()
+
+    path = digest_path(now, out)
+    write_digest(render_digest(ranking, sources, settings, now), path)
+    typer.echo(f"digest: {path} ({len(ranking.stories)} stories)")
 
 
 @app.command()
@@ -100,8 +120,9 @@ def run(
     settings_path: SettingsOption = cfg.DEFAULT_PATH,
     filters_path: FiltersOption = Path("filters.toml"),
     db_path: DbOption = db.DEFAULT_PATH,
+    out: OutOption = DEFAULT_DIR,
 ) -> None:
-    """Run the full pipeline: fetch, then digest."""
+    """Run the full pipeline: fetch once, then write today's digest."""
     fetch(
         force=False,
         config=config,
@@ -109,7 +130,7 @@ def run(
         filters_path=filters_path,
         db_path=db_path,
     )
-    digest()
+    digest(config=config, settings_path=settings_path, db_path=db_path, out=out)
 
 
 @app.command()

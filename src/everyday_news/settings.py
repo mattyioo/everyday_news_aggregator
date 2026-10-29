@@ -15,6 +15,7 @@ class SettingsError(ValueError):
 class Settings:
     retention_days: int = 30
     digest_hours: int = 24
+    stories_per_site: int = 10
 
 
 def load_settings(path: Path = DEFAULT_PATH) -> Settings:
@@ -27,7 +28,8 @@ def load_settings(path: Path = DEFAULT_PATH) -> Settings:
 
     days = _whole_number(data, "retention_days", Settings.retention_days, 1, 3650, path)
     hours = _whole_number(data, "digest_hours", Settings.digest_hours, 1, 24 * 30, path)
-    return Settings(retention_days=days, digest_hours=hours)
+    per_site = _whole_number(data, "stories_per_site", Settings.stories_per_site, 1, 100, path)
+    return Settings(retention_days=days, digest_hours=hours, stories_per_site=per_site)
 
 
 def _whole_number(data: dict, key: str, default: int, low: int, high: int, path: Path) -> int:

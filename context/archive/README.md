@@ -16,3 +16,4 @@ Finished changes, moved here from `context/change/`. Not edited after archiving.
 | 0009-rule-filters | 2 | 2026-10-29 | `filters.toml`: muted words + EN/PL headline rules (drop/downrank) with reasons |
 | 0010-heuristic-scoring | 2 | 2026-10-29 | `rank.py`: weight × recency × coverage × downrank, lead article choice, `digest_hours`, `news top` |
 | 0011-summaries | 3 | 2026-10-29 | Extractive summaries: whole sentences ≤ 280 chars, EN/PL abbreviation-aware |
+| 0012-markdown-digest | 3 | 2026-10-29 | `news digest` / `news run` write `digests/YYYY-MM-DD.md`, one section per site |

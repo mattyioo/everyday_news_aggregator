@@ -37,6 +37,8 @@ def test_run_calls_fetch_and_digest(tmp_path: Path) -> None:
             str(ROOT / "filters.toml"),
             "--db",
             str(tmp_path / "x.db"),
+            "--out",
+            str(tmp_path / "digests"),
         ],
     )
     assert result.exit_code == 0, result.output
@@ -44,3 +46,5 @@ def test_run_calls_fetch_and_digest(tmp_path: Path) -> None:
     assert "0 request(s) sent, 0 new article(s), 0 duplicate(s), 0 deleted" in result.output
     assert "0 stories, 0 filtered" in result.output
     assert "digest:" in result.output
+    (written,) = (tmp_path / "digests").glob("*.md")
+    assert written.read_text(encoding="utf-8").startswith("# Everyday News – ")
