@@ -1,6 +1,7 @@
 """Render the ranked stories as a Markdown digest, one section per site."""
 
 import re
+from collections import Counter
 from datetime import datetime, tzinfo
 from pathlib import Path
 
@@ -90,7 +91,38 @@ def render_digest(
         out += [_entry(s, names, now, tz) for s in shown]
         if len(stories) > len(shown):
             out += ["", f"_+ {len(stories) - len(shown)} more stories not shown_"]
+    out += _filtered_section(ranking, names, now, tz)
     return "\n".join(out) + "\n"
+
+
+def _filtered_section(
+    ranking: Ranking, names: dict[str, str], now: datetime, tz: tzinfo | None
+) -> list[str]:
+    """What the filters hid (with links) and a tally of what they only downranked."""
+    out = ["", f"## Filtered out ({len(ranking.dropped)})", ""]
+    out.append("_Hidden by rules in `filters.toml`; edit it if something here should stay._")
+
+    by_reason: dict[str, list[Item]] = {}
+    for item in ranking.dropped:
+        by_reason.setdefault(item.reason or "unknown", []).append(item)
+    if not by_reason:
+        out += ["", "_Nothing was filtered out._"]
+    for reason, items in sorted(by_reason.items(), key=lambda kv: (-len(kv[1]), kv[0])):
+        out += ["", f"**{escape(reason)}** ({len(items)})", ""]
+        out += [
+            f"- [{escape(i.title)}]({i.url}) · {escape(names.get(i.source_id, i.source_id))}"
+            f" · {_when(i.published, now, tz)}"
+            for i in items
+        ]
+
+    downranked = Counter(
+        i.reason for s in ranking.stories for i in s.items if i.action == "downrank"
+    )
+    if downranked:
+        ordered = sorted(downranked.items(), key=lambda kv: (-kv[1], kv[0] or ""))
+        tally = " · ".join(f"{escape(r or 'unknown')} {n}" for r, n in ordered)
+        out += ["", f"_Downranked but shown: {tally}_"]
+    return out
 
 
 def digest_path(now: datetime, directory: Path = DEFAULT_DIR, tz: tzinfo | None = None) -> Path:

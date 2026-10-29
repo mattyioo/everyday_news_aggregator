@@ -17,3 +17,4 @@ Finished changes, moved here from `context/change/`. Not edited after archiving.
 | 0010-heuristic-scoring | 2 | 2026-10-29 | `rank.py`: weight × recency × coverage × downrank, lead article choice, `digest_hours`, `news top` |
 | 0011-summaries | 3 | 2026-10-29 | Extractive summaries: whole sentences ≤ 280 chars, EN/PL abbreviation-aware |
 | 0012-markdown-digest | 3 | 2026-10-29 | `news digest` / `news run` write `digests/YYYY-MM-DD.md`, one section per site |
+| 0013-filtered-report | 3 | 2026-10-29 | Digest ends with dropped articles by reason (links) and a downrank tally |

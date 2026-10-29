@@ -44,7 +44,7 @@ def test_header_and_one_section_per_enabled_site_in_config_order() -> None:
     lines = md.splitlines()
     assert lines[0] == "# Everyday News – 2026-10-29"
     assert lines[2] == "_Generated 20:00 · last 24 h · 1 stories from 1 sites · 0 filtered out_"
-    headings = [line for line in lines if line.startswith("## ")]
+    headings = [line for line in lines if line.startswith("## ") and "Filtered" not in line]
     assert headings == ["## Hacker News (0)", "## BBC News World (1)", "## WP.pl Wiadomości (0)"]
     assert md.count("_Nothing new._") == 2
 
@@ -107,3 +107,34 @@ def test_digest_path_uses_local_date_and_write_creates_directory(tmp_path: Path)
     write_digest("# x\n", path)
     write_digest("# y\n", path)  # same day: overwritten
     assert path.read_text(encoding="utf-8") == "# y\n"
+
+
+def test_filtered_section_groups_drops_by_reason_and_tallies_downranks() -> None:
+    bait = item(
+        1, "wp", "Aż 1,5 mln wyświetleń", hours_ago=3, action="drop", reason="view-count bait"
+    )
+    szok = item(2, "wp", "Szok!", hours_ago=2, action="drop", reason="sensational")
+    more = item(
+        3, "wp", "Aż 2 mln wyświetleń", hours_ago=1, action="drop", reason="view-count bait"
+    )
+    video = item(4, "bbc", "Watch: x", action="downrank", reason="video")
+    teaser = item(5, "wp", "Jest nagranie", action="downrank", reason="teaser headline")
+    md = render(
+        story(1, video, downranked="video"),
+        story(2, item(6, "wp", "Plain"), teaser),
+        dropped=(more, szok, bait),
+    )
+    section = md[md.index("## Filtered out (3)") :]
+    assert "`filters.toml`" in section
+    assert section.index("**view-count bait** (2)") < section.index("**sensational** (1)")
+    assert "- [Aż 2 mln wyświetleń](https://x/3) · WP.pl Wiadomości · 19:00" in section
+    assert "- [Szok!](https://x/2) · WP.pl Wiadomości · 18:00" in section
+    assert "_Downranked but shown: teaser headline 1 · video 1_" in section
+    assert "_3 filtered out_" not in md and "· 3 filtered out_" in md
+
+
+def test_filtered_section_when_nothing_was_filtered() -> None:
+    md = render(story(1, item(1, "bbc", "Plain")))
+    section = md[md.index("## Filtered out (0)") :]
+    assert "_Nothing was filtered out._" in section
+    assert "Downranked but shown" not in md

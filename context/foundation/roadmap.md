@@ -52,7 +52,7 @@ Turn a pile of articles into a short list of real stories.
 
 **Exit:** a day's articles reduce to a ranked story list; every drop has a reason.
 
-## Phase 3 – Digest 🔄
+## Phase 3 – Digest ✅
 
 Something to actually read.
 
@@ -60,9 +60,10 @@ Something to actually read.
 |---|---|
 | 0011-summaries – extractive per-story summary (feed description / lead sentences) | ✅ archived |
 | 0012-markdown-digest – `digests/YYYY-MM-DD.md`, one section per site | ✅ archived |
-| filtered-report – "what was dropped and why" section | ⏳ |
+| 0013-filtered-report – "what was dropped and why" section | ✅ archived |
 
 **Exit:** `news run` produces a digest readable in under 10 minutes.
+_Met 2026-10-29: real `news run` → 67 stories, 30 shown, ~1080 words (≈ 4–5 min)._
 
 ## Phase 4 – Tracking
 
