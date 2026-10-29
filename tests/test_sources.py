@@ -79,3 +79,11 @@ def test_cli_lists_sources_and_reports_errors(tmp_path: Path) -> None:
     bad = runner.invoke(app, ["sources", "--config", str(tmp_path / "nope.toml")])
     assert bad.exit_code == 1
     assert "file not found" in bad.output
+
+
+def test_digest_hours_per_source(tmp_path: Path) -> None:
+    ok = write(tmp_path, VALID.replace("enabled = false", "enabled = false\ndigest_hours = 168"))
+    assert [s.digest_hours for s in load_sources(ok)] == [None, 168]
+    bad = write(tmp_path, VALID.replace("enabled = false", "digest_hours = 0"))
+    with pytest.raises(SourceConfigError, match="digest_hours must be a whole number"):
+        load_sources(bad)

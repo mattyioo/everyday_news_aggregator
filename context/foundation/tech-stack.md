@@ -27,4 +27,4 @@ All checked working on 2026-10-29.
 | Hacker News | en | `https://news.ycombinator.com/rss` | Front page only. `hnrss.org/frontpage` adds points and comment counts, useful for scoring later |
 | BBC News World | en | `https://feeds.bbci.co.uk/news/world/rss.xml` | General world news, no paywall. Links carry `at_medium`/`at_campaign` tracking params (stripped). No ETag/Last-Modified |
 | WP.pl – Wiadomości | pl | `https://wiadomosci.wp.pl/rss.xml` | High volume, more clickbait: main target for noise filters |
-| Znośne Newsy | pl | `https://znosnenewsy.pl/feed/` | Low volume, curated. Trailing slash matters (no slash = 301). Only source with ETag/Last-Modified |
+| Znośne Newsy | pl | `https://znosnenewsy.pl/feed/` | Low volume, curated. Trailing slash matters (no slash = 301). Only source with ETag/Last-Modified. Posts a few times a week: 7-day digest window |

@@ -7,6 +7,8 @@
 # weight          ranking weight, 0.0–2.0 (1.0 = normal)
 # tags            free-form labels
 # enabled         false = skip without deleting
+# digest_hours    optional: this site's digest window, overriding settings.toml
+#                 (useful for slow sites that post a few times a week)
 # fetch_fulltext  also download each article page. Off by default: it means one
 #                 extra request per article, which is exactly the spammy pattern we avoid.
 
@@ -47,5 +49,6 @@ url = "https://znosnenewsy.pl/feed/"
 lang = "pl"
 weight = 1.0
 tags = ["general", "tech"]
+digest_hours = 168  # posts a few times a week: show the last 7 days
 enabled = true
 fetch_fulltext = false

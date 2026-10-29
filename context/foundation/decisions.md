@@ -33,3 +33,4 @@ Need answers before the change that depends on them.
 | 2026-10-29 | No topic categories. News is grouped only by site (source); the digest has one section per site | User choice; keyword categories were tried (uncommitted) and dropped |
 | 2026-10-29 | Retention: articles are deleted 30 days after they were last seen in their feed, at launch | User approved automatic deletion; last-seen (not publish date) avoids re-importing items still in a feed |
 | 2026-10-29 | Retention shortened from 30 to 7 days (`settings.toml`) | User choice |
+| 2026-10-29 | Per-site digest window: Znośne Newsy shows 7 days (`digest_hours = 168` in `sources.toml`), others 24 h | User request; slow site was always "Nothing new" |

@@ -138,3 +138,10 @@ def test_filtered_section_when_nothing_was_filtered() -> None:
     section = md[md.index("## Filtered out (0)") :]
     assert "_Nothing was filtered out._" in section
     assert "Downranked but shown" not in md
+
+
+def test_header_names_sites_with_their_own_window() -> None:
+    slow = Source(id="zn", name="Znośne Newsy", url="https://zn.example/f", lang="pl",
+                  digest_hours=168)  # fmt: skip
+    md = render_digest(Ranking((), ()), [*SOURCES, slow], SETTINGS, NOW, tz=WARSAW)
+    assert "_Own window: Znośne Newsy 168 h_" in md

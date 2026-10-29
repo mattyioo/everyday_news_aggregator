@@ -65,14 +65,15 @@ Something to actually read.
 **Exit:** `news run` produces a digest readable in under 10 minutes.
 _Met 2026-10-29: real `news run` → 67 stories, 30 shown, ~1080 words (≈ 4–5 min)._
 
-## Phase 4 – Tracking
+## Phase 4 – Tracking 🔄
 
 Follow stories over days instead of rereading them.
 
 | Change | Status |
 |---|---|
-| followed-topics – follow/unfollow topics or stories | ⏳ |
-| whats-new – show only new developments since last digest | ⏳ |
+| 0014-per-site-window – longer digest window for slow sites (Znośne Newsy 7 days) | ✅ archived |
+| 0015-whats-new – mark what is new since the last digest | ⏳ |
+| 0016-followed-topics – follow stories / topics; followed ones show only updates | ⏳ |
 
 **Exit:** a followed story shows only its updates in later digests.
 

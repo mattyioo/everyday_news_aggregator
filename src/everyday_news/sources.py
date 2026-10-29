@@ -22,6 +22,7 @@ class Source:
     tags: tuple[str, ...] = field(default_factory=tuple)
     enabled: bool = True
     fetch_fulltext: bool = False
+    digest_hours: int | None = None  # overrides settings.toml for this site
 
 
 def load_sources(path: Path = DEFAULT_PATH) -> list[Source]:
@@ -72,6 +73,14 @@ def _parse(entry: dict, path: Path, index: int) -> Source:
         if key in entry and not isinstance(entry[key], bool):
             raise SourceConfigError(f"{where}: {key} must be true or false")
 
+    digest_hours = entry.get("digest_hours")
+    if digest_hours is not None and (
+        not isinstance(digest_hours, int)
+        or isinstance(digest_hours, bool)
+        or not 1 <= digest_hours <= 720
+    ):
+        raise SourceConfigError(f"{where}: digest_hours must be a whole number from 1 to 720")
+
     return Source(
         id=entry["id"],
         name=entry["name"],
@@ -81,4 +90,5 @@ def _parse(entry: dict, path: Path, index: int) -> Source:
         tags=tuple(tags),
         enabled=entry.get("enabled", True),
         fetch_fulltext=entry.get("fetch_fulltext", False),
+        digest_hours=digest_hours,
     )

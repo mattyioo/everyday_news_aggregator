@@ -18,3 +18,4 @@ Finished changes, moved here from `context/change/`. Not edited after archiving.
 | 0011-summaries | 3 | 2026-10-29 | Extractive summaries: whole sentences ≤ 280 chars, EN/PL abbreviation-aware |
 | 0012-markdown-digest | 3 | 2026-10-29 | `news digest` / `news run` write `digests/YYYY-MM-DD.md`, one section per site |
 | 0013-filtered-report | 3 | 2026-10-29 | Digest ends with dropped articles by reason (links) and a downrank tally |
+| 0014-per-site-window | 4 | 2026-10-29 | Optional per-source `digest_hours`; Znośne Newsy 7 days |

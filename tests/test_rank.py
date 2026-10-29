@@ -109,3 +109,14 @@ def test_window_uses_newest_kept_article(conn) -> None:
     assert [s.lead.title for s in rank(conn, hours=48).stories] == [
         "Old but updated", "Old", "Old",
     ]  # fmt: skip
+
+
+def test_per_site_window_overrides_global(tmp_path: Path) -> None:
+    conn = db.connect(tmp_path / "w.db")
+    slow = Source(id="zn", name="ZN", url="https://zn.example/f", lang="pl", digest_hours=168)
+    story(conn, ("zn", 100, "Slow site post", "t", None), lang="pl")
+    story(conn, ("bbc", 100, "Old BBC", "t", None))
+    story(conn, ("zn", 200, "Too old even for 7 days", "t", None), lang="pl")
+    ranking = rank_stories(conn, [*SOURCES, slow], NOW, 24)
+    assert [s.lead.title for s in ranking.stories] == ["Slow site post"]
+    conn.close()

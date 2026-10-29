@@ -60,8 +60,14 @@ class Ranking:
 def rank_stories(
     conn: sqlite3.Connection, sources: list[Source], now: datetime, hours: int
 ) -> Ranking:
+    """Stories with a kept article inside its site's window (`digest_hours` of the source,
+    else `hours`), best first, plus the dropped articles in the same windows."""
     weights = {s.id: s.weight for s in sources}
-    since = now - timedelta(hours=hours)
+    windows = {s.id: timedelta(hours=s.digest_hours or hours) for s in sources}
+    default_window = timedelta(hours=hours)
+
+    def in_window(i: Item) -> bool:
+        return i.published >= now - windows.get(i.source_id, default_window)
 
     by_story: dict[int, tuple[str, list[Item]]] = {}
     for row in conn.execute(
@@ -89,10 +95,9 @@ def rank_stories(
     stories = []
     dropped = []
     for story_id, (lang, items) in by_story.items():
-        recent = [i for i in items if i.published >= since]
-        dropped += [i for i in recent if i.action == "drop"]
+        dropped += [i for i in items if i.action == "drop" and in_window(i)]
         kept = [i for i in items if i.action != "drop"]
-        if not any(i.published >= since for i in kept):
+        if not any(in_window(i) for i in kept):
             continue
         stories.append(_score(story_id, lang, kept, weights, now))
 

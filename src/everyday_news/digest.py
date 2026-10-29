@@ -81,6 +81,13 @@ def render_digest(
         f"{len(ranking.stories)} stories from {len(by_site)} sites · "
         f"{len(ranking.dropped)} filtered out_",
     ]
+    longer = [
+        f"{escape(s.name)} {s.digest_hours} h"
+        for s in sources
+        if s.enabled and s.digest_hours and s.digest_hours != settings.digest_hours
+    ]
+    if longer:
+        out += ["", f"_Own window: {', '.join(longer)}_"]
     for site_id in site_ids:
         stories = by_site.get(site_id, [])
         out += ["", f"## {escape(names.get(site_id, site_id))} ({len(stories)})", ""]
