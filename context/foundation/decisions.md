@@ -26,3 +26,5 @@ Need answers before the change that depends on them.
 | 2026-10-29 | Polite fetching: honest User-Agent, one request per feed per run, sequential with a pause between hosts, conditional GET (ETag / Last-Modified), timeouts, no retry loops, back off on 429. No full-text page fetching by default | Same |
 | 2026-10-29 | `0014-scheduled-runs` dropped; it contradicts refresh-on-launch | Follows from the above |
 | 2026-10-29 | `.env` stays gitignored but is unused: no secrets are needed (no LLM, public feeds) | No API keys in the project |
+| 2026-10-29 | Fetch cooldown 15 min per source; 60 min after a failed fetch. `--force` skips the cooldown only | Relaunching must not resend requests; failing sites get extra quiet time |
+| 2026-10-29 | HTTP client never follows redirects; feed URLs must be the final URL | A redirect doubles the requests |

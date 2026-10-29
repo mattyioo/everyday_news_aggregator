@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	>
+
+<channel>
+	<title>Znosne Newsy</title>
+	<atom:link href="https://znosnenewsy.pl/feed/" rel="self" type="application/rss+xml" />
+	<link>https://znosnenewsy.pl/</link>
+	<description>Bez clickbaitu i AI</description>
+	<lastBuildDate>Thu, 29 Oct 2026 11:00:59 +0000</lastBuildDate>
+	<language>pl-PL</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=7.0.8</generator>
+	<item>
+		<title>Pierwszy dotykowy laptop Apple i nowy MacBook Pro M6</title>
+		<link>https://znosnenewsy.pl/nowy-macbook-pro-m6-start-przedsprzedazy/</link>
+		
+		<dc:creator><![CDATA[Kinga]]></dc:creator>
+		<pubDate>Wed, 28 Oct 2026 18:22:06 +0000</pubDate>
+				<category><![CDATA[lifestyle]]></category>
+		<category><![CDATA[apple]]></category>
+		<category><![CDATA[MacBook]]></category>
+		<category><![CDATA[macbook pro M6]]></category>
+		<category><![CDATA[MacBook Pro z wyświetlaczem PROLED XDR]]></category>
+		<category><![CDATA[PROLED XDR]]></category>
+		<guid isPermaLink="false">https://znosnenewsy.pl/?p=4292</guid>
+
+					<description><![CDATA[<p>Apple wypuściło zapowiadanego, nowego MacBooka Pro, który po raz pierwszy w historii komputerów Mac łączy profesjonalną wydajność z obsługą dotykową. [&#8230;]</p>
+<p>Artykuł <a href="https://znosnenewsy.pl/nowy-macbook-pro-m6-start-przedsprzedazy/">Pierwszy dotykowy laptop Apple i nowy MacBook Pro M6</a> pochodzi z serwisu <a href="https://znosnenewsy.pl">Znosne Newsy</a>.</p>
+]]></description>
+		
+		
+		
+			</item>
+<item>
+		<title>PRUF: platforma tylko dla prawdziwych ludzi?</title>
+		<link>https://znosnenewsy.pl/pruf-platforma-tylko-dla-prawdziwych-ludzi/</link>
+		
+		<dc:creator><![CDATA[Paula]]></dc:creator>
+		<pubDate>Wed, 28 Oct 2026 10:27:07 +0000</pubDate>
+				<category><![CDATA[komentarz]]></category>
+		<category><![CDATA[lifestyle]]></category>
+		<category><![CDATA[AI]]></category>
+		<category><![CDATA[privacy]]></category>
+		<category><![CDATA[pruf]]></category>
+		<category><![CDATA[prywatność]]></category>
+		<category><![CDATA[social media]]></category>
+		<guid isPermaLink="false">https://znosnenewsy.pl/?p=4285</guid>
+
+					<description><![CDATA[<p>Od newsów o AI trudno ostatnio uciec. Kolejne modele, boty i agenci pojawiają się szybciej, niż nadążamy o nich pisać. [&#8230;]</p>
+<p>Artykuł <a href="https://znosnenewsy.pl/pruf-platforma-tylko-dla-prawdziwych-ludzi/">PRUF: platforma tylko dla prawdziwych ludzi?</a> pochodzi z serwisu <a href="https://znosnenewsy.pl">Znosne Newsy</a>.</p>
+]]></description>
+		
+		
+		<enclosure url="https://znosnenewsy.pl/wp-content/uploads/2026/10/pruf-net-from-zero.mp4" length="49119658" type="video/mp4" />
+
+			</item>
+<item>
+		<title>Porażka iPhona Duo? The Great Folding Test III</title>
+		<link>https://znosnenewsy.pl/porazka-iphona-duo-the-great-folding-test-iii/</link>
+		
+		<dc:creator><![CDATA[Kinga]]></dc:creator>
+		<pubDate>Mon, 26 Oct 2026 18:51:09 +0000</pubDate>
+				<category><![CDATA[komentarz]]></category>
+		<category><![CDATA[apple]]></category>
+		<category><![CDATA[iPhone duo]]></category>
+		<category><![CDATA[The Great Folding Test]]></category>
+		<guid isPermaLink="false">https://znosnenewsy.pl/?p=4226</guid>
+
+					<description><![CDATA[<p>Wielki Test Składania III &#8211; czyli live u Kuby, gdzie testowaliśmy wytrzymałość iPhona Duo, skończył się wcześniej, niż myśleliśmy. Duo [&#8230;]</p>
+<p>Artykuł <a href="https://znosnenewsy.pl/porazka-iphona-duo-the-great-folding-test-iii/">Porażka iPhona Duo? The Great Folding Test III</a> pochodzi z serwisu <a href="https://znosnenewsy.pl">Znosne Newsy</a>.</p>
+]]></description>
+		
+		
+		<enclosure url="https://znosnenewsy.pl/wp-content/uploads/2026/10/ScreenRecording_10-26-2026-10-01-29_1-2.mp4" length="14358453" type="video/mp4" />
+
+			</item>
+	</channel>
+</rss>

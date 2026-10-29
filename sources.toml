@@ -43,7 +43,7 @@ fetch_fulltext = false
 [[source]]
 id = "znosnenewsy"
 name = "Znośne Newsy"
-url = "https://znosnenewsy.pl/feed"
+url = "https://znosnenewsy.pl/feed/"
 lang = "pl"
 weight = 1.0
 tags = ["general", "tech"]
