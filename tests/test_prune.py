@@ -128,4 +128,4 @@ def test_settings_file(tmp_path: Path) -> None:
 
 
 def test_project_settings_file_is_valid() -> None:
-    assert load_settings(Path(__file__).parent.parent / "settings.toml").retention_days == 30
+    assert load_settings(Path(__file__).parent.parent / "settings.toml").retention_days == 7

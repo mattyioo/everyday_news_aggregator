@@ -2,4 +2,4 @@
 
 # Articles are deleted this many days after they were last seen in their site's feed.
 # Deletion happens when the app is launched (`news fetch` / `news run`), never in the background.
-retention_days = 30
+retention_days = 7

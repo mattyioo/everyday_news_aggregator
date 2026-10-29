@@ -32,3 +32,4 @@ Need answers before the change that depends on them.
 | 2026-10-29 | English and Polish stories are grouped separately; no cross-language matching | User confirmed; matching across languages would need translation or an LLM |
 | 2026-10-29 | No topic categories. News is grouped only by site (source); the digest has one section per site | User choice; keyword categories were tried (uncommitted) and dropped |
 | 2026-10-29 | Retention: articles are deleted 30 days after they were last seen in their feed, at launch | User approved automatic deletion; last-seen (not publish date) avoids re-importing items still in a feed |
+| 2026-10-29 | Retention shortened from 30 to 7 days (`settings.toml`) | User choice |

@@ -21,7 +21,7 @@ sources.toml ──► Fetch ──► Normalize ──► Dedupe/Cluster ──
 | **Filter/Score** | Rule-based only: muted topics, per-language clickbait patterns, heuristic score (source weight, recency, number of sources covering it). Every decision records a reason |
 | **Summarize** | Extractive, no LLM: feed description, or the first sentences of the article text |
 | **Digest** | Render the day's top stories to Markdown, one section per site (no topic categories) |
-| **Prune** | At launch, delete articles not seen in their feed for `retention_days` (30) |
+| **Prune** | At launch, delete articles not seen in their feed for `retention_days` (7) |
 | **Tracking** *(Phase 4)* | Followed topics; show what is new since the last digest |
 | **CLI** | Entry point: `news fetch`, `news digest`, `news run` (everything) |
 

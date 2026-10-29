@@ -29,6 +29,6 @@ python3 -m venv .venv
 ```
 
 Feeds are configured in `sources.toml`; `settings.toml` sets how long news is kept
-(`retention_days`, default 30 days after an article leaves its feed).
+(`retention_days`, currently 7 days after an article leaves its feed).
 
 Project plans and change history live in `context/` (see `context/README.md`).
