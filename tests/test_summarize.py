@@ -72,8 +72,8 @@ def test_sentence_split_respects_abbreviations(text: str, count: int) -> None:
 
 
 def item(title: str, text: str) -> Item:
-    return Item(1, "hn", title, "https://x", None, text, datetime(2026, 10, 29, tzinfo=UTC),
-                None, None)  # fmt: skip
+    when = datetime(2026, 10, 29, tzinfo=UTC)
+    return Item(1, "hn", title, "https://x", None, text, when, when, None, None)
 
 
 def test_story_summary_uses_first_item_with_text() -> None:

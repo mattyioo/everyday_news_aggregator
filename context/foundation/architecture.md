@@ -22,7 +22,7 @@ sources.toml ──► Fetch ──► Normalize ──► Dedupe/Cluster ──
 | **Summarize** | Extractive, no LLM (`summarize.py`): whole sentences of the lead text up to 280 chars, abbreviation-aware, truncated feed excerpts trimmed to the last full sentence; HN items have none |
 | **Digest** | `news digest` → `digests/YYYY-MM-DD.md` (local date): one section per enabled site in `sources.toml` order, story under its lead article's site with other coverage nested, ≤ `stories_per_site` (10) each, local times (no topic categories); ends with "Filtered out": dropped articles by reason with links + downrank tally |
 | **Prune** | At launch, delete articles not seen in their feed for `retention_days` (7) |
-| **Tracking** *(Phase 4)* | Followed topics; show what is new since the last digest |
+| **Tracking** *(Phase 4)* | `digest_run` records each digest; baseline = last digest before the latest fetch; stories marked 🆕 new / 🔄 updated by fetch time and listed first per site. Followed topics/stories: see 0016 |
 | **CLI** | Entry point: `news fetch`, `news digest`, `news run` (everything) |
 
 ## Data model
@@ -41,6 +41,7 @@ Schema changes to an existing `news.db` go through `MIGRATIONS` in `db.py` (trac
 - `story` – id, lang, title (from the highest-weight source), first_seen, last_updated
 - `story_article` – story_id, article_id (unique); only primary (non-duplicate) articles
 - `article_verdict` – article_id, action (`drop` / `downrank`), reason; recomputed every run
+- `digest_run` – id, generated_at (one row per digest written)
 
 Planned:
 

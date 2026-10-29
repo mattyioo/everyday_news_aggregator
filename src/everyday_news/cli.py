@@ -18,6 +18,7 @@ from everyday_news.normalize import normalize_pending
 from everyday_news.prune import prune
 from everyday_news.rank import rank_stories
 from everyday_news.sources import DEFAULT_PATH, Source, SourceConfigError, load_sources
+from everyday_news.visits import baseline, record_digest
 
 app = typer.Typer(help="Personal news aggregator.", no_args_is_help=True)
 
@@ -106,11 +107,12 @@ def digest(
     conn = db.connect(db_path)
     try:
         ranking = rank_stories(conn, sources, now, settings.digest_hours)
+        since = baseline(conn)
+        path = digest_path(now, out)
+        write_digest(render_digest(ranking, sources, settings, now, since=since), path)
+        record_digest(conn, now)
     finally:
         conn.close()
-
-    path = digest_path(now, out)
-    write_digest(render_digest(ranking, sources, settings, now), path)
     typer.echo(f"digest: {path} ({len(ranking.stories)} stories)")
 
 

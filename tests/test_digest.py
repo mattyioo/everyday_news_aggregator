@@ -26,6 +26,7 @@ def item(n: int, source: str, title: str, text: str = "", hours_ago: float = 1, 
         discussion_url=kw.get("discussion"),
         text=text,
         published=NOW - timedelta(hours=hours_ago),
+        fetched=kw.get("fetched", NOW - timedelta(hours=hours_ago)),
         action=kw.get("action"),
         reason=kw.get("reason"),
     )
@@ -46,7 +47,7 @@ def test_header_and_one_section_per_enabled_site_in_config_order() -> None:
     assert lines[2] == "_Generated 20:00 · last 24 h · 1 stories from 1 sites · 0 filtered out_"
     headings = [line for line in lines if line.startswith("## ") and "Filtered" not in line]
     assert headings == ["## Hacker News (0)", "## BBC News World (1)", "## WP.pl Wiadomości (0)"]
-    assert md.count("_Nothing new._") == 2
+    assert md.count("_No stories in the window._") == 2
 
 
 def test_entry_with_summary_time_discussion_and_nested_coverage() -> None:
@@ -55,7 +56,7 @@ def test_entry_with_summary_time_discussion_and_nested_coverage() -> None:
     video = item(3, "bbc", "Watch: scene", hours_ago=26, action="downrank", reason="video")
     md = render(story(1, lead, hn, video))
     assert "- **[What we know so far](https://x/1)**\n  More than 500 passengers. On board.\n" in md
-    assert "  _11:00_\n" in md  # 10:00 UTC shown in Warsaw time
+    assert "  _11:00 · \\#1_\n" in md  # 10:00 UTC shown in Warsaw time; story id
     assert (
         "  - also: [Spain crash](https://x/2) · Hacker News · 10:00"
         " · [discussion](https://news.ycombinator.com/i)"
@@ -65,12 +66,14 @@ def test_entry_with_summary_time_discussion_and_nested_coverage() -> None:
 
 def test_hn_entry_without_text_has_no_summary_line() -> None:
     md = render(story(1, item(1, "hn", "Toxic Experts", discussion="https://hn/1")))
-    assert "- **[Toxic Experts](https://x/1)**\n  _19:00 · [discussion](https://hn/1)_\n" in md
+    assert (
+        "- **[Toxic Experts](https://x/1)**\n  _19:00 · [discussion](https://hn/1) · \\#1_\n" in md
+    )
 
 
 def test_downranked_story_says_why() -> None:
     lead = item(1, "bbc", "Watch: King dances", action="downrank", reason="video")
-    assert "_19:00 · downranked: video_" in render(story(1, lead, downranked="video"))
+    assert "_19:00 · downranked: video · \\#1_" in render(story(1, lead, downranked="video"))
 
 
 def test_cap_per_site_and_count_of_rest() -> None:
@@ -145,3 +148,31 @@ def test_header_names_sites_with_their_own_window() -> None:
                   digest_hours=168)  # fmt: skip
     md = render_digest(Ranking((), ()), [*SOURCES, slow], SETTINGS, NOW, tz=WARSAW)
     assert "_Own window: Znośne Newsy 168 h_" in md
+
+
+SINCE = NOW - timedelta(hours=2)
+
+
+def test_markers_for_new_and_updated_stories_and_header_counts() -> None:
+    new = story(1, item(1, "bbc", "Brand new", "T.", fetched=NOW))
+    old_lead = item(2, "bbc", "Ongoing", "T.", hours_ago=5)
+    update = item(3, "bbc", "Ongoing: update", hours_ago=1, fetched=NOW)
+    updated = story(2, old_lead, update)
+    seen = story(3, item(4, "bbc", "Seen before", "T.", hours_ago=4), score=9.0)
+    md = render_digest(Ranking((seen, updated, new), ()), SOURCES, SETTINGS, NOW, WARSAW, SINCE)
+
+    assert "_1 new · 1 updated since your last digest (18:00)_" in md
+    assert "- 🆕 **[Brand new](https://x/1)**" in md
+    assert "- 🔄 **[Ongoing](https://x/2)**" in md
+    assert "  - also: [Ongoing: update](https://x/3) · BBC News World · 19:00 · new" in md
+    # New and updated come before seen ones despite lower scores, so the cap (2) cuts
+    # the seen story first
+    assert md.index("Ongoing") < md.index("Brand new")  # among fresh ones, score order holds
+    assert "Seen before" not in md
+    assert "_+ 1 more stories not shown_" in md
+
+
+def test_first_digest_has_no_markers() -> None:
+    md = render(story(1, item(1, "bbc", "Anything", "T.", fetched=NOW)))
+    assert "_First digest: nothing earlier to compare with._" in md
+    assert "🆕" not in md

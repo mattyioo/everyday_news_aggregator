@@ -33,23 +33,47 @@ def _discussion(item: Item) -> str:
     return f" · [discussion]({item.discussion_url})" if item.discussion_url else ""
 
 
-def _entry(story: RankedStory, names: dict[str, str], now: datetime, tz: tzinfo | None) -> str:
+BADGES = {"new": "🆕 ", "updated": "🔄 "}
+
+
+def story_status(story: RankedStory, since: datetime | None) -> str | None:
+    """ "new" (every article arrived after `since`), "updated" (some did), else None."""
+    if since is None:
+        return None
+    fresh = [i for i in story.items if i.fetched > since]
+    if not fresh:
+        return None
+    return "new" if len(fresh) == len(story.items) else "updated"
+
+
+def _entry(
+    story: RankedStory,
+    names: dict[str, str],
+    now: datetime,
+    tz: tzinfo | None,
+    since: datetime | None,
+) -> str:
     lead = story.lead
-    lines = [f"- **[{escape(lead.title)}]({lead.url})**"]
+    status = story_status(story, since)
+
+    def fresh(item: Item) -> str:
+        return " · new" if status == "updated" and item.fetched > since else ""
+
+    lines = [f"- {BADGES.get(status, '')}**[{escape(lead.title)}]({lead.url})**"]
     summary = story_summary(story)
     if summary:
         lines.append(f"  {escape(summary)}")
 
-    meta = f"{_when(lead.published, now, tz)}{_discussion(lead)}"
+    meta = f"{_when(lead.published, now, tz)}{_discussion(lead)}{fresh(lead)}"
     if story.downranked:
         meta += f" · downranked: {escape(story.downranked)}"
-    lines.append(f"  _{meta}_")
+    lines.append(f"  _{meta} · \\#{story.id}_")
 
     for item in story.others[:MAX_ALSO]:
         site = escape(names.get(item.source_id, item.source_id))
         lines.append(
             f"  - also: [{escape(item.title)}]({item.url}) · {site}"
-            f" · {_when(item.published, now, tz)}{_discussion(item)}"
+            f" · {_when(item.published, now, tz)}{_discussion(item)}{fresh(item)}"
         )
     if len(story.others) > MAX_ALSO:
         lines.append(f"  - + {len(story.others) - MAX_ALSO} more")
@@ -62,8 +86,10 @@ def render_digest(
     settings: Settings,
     now: datetime,
     tz: tzinfo | None = None,
+    since: datetime | None = None,
 ) -> str:
-    """Markdown for the whole digest. `tz=None` uses the machine's local timezone."""
+    """Markdown for the whole digest. `tz=None` uses the machine's local timezone;
+    `since` (the previous visit, see visits.baseline) enables new/updated markers."""
     names = {s.id: s.name for s in sources}
     by_site: dict[str, list[RankedStory]] = {}
     for story in ranking.stories:
@@ -88,14 +114,25 @@ def render_digest(
     ]
     if longer:
         out += ["", f"_Own window: {', '.join(longer)}_"]
+    if since is None:
+        out += ["", "_First digest: nothing earlier to compare with._"]
+    else:
+        statuses = [story_status(s, since) for s in ranking.stories]
+        out += [
+            "",
+            f"_{statuses.count('new')} new · {statuses.count('updated')} updated "
+            f"since your last digest ({_when(since, now, tz)})_",
+        ]
     for site_id in site_ids:
         stories = by_site.get(site_id, [])
         out += ["", f"## {escape(names.get(site_id, site_id))} ({len(stories)})", ""]
         if not stories:
-            out.append("_Nothing new._")
+            out.append("_No stories in the window._")
             continue
+        # New and updated first (each still by score), so the cap cuts seen stories first
+        stories.sort(key=lambda s: story_status(s, since) is None)
         shown = stories[: settings.stories_per_site]
-        out += [_entry(s, names, now, tz) for s in shown]
+        out += [_entry(s, names, now, tz, since) for s in shown]
         if len(stories) > len(shown):
             out += ["", f"_+ {len(stories) - len(shown)} more stories not shown_"]
     out += _filtered_section(ranking, names, now, tz)

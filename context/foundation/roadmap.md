@@ -72,7 +72,7 @@ Follow stories over days instead of rereading them.
 | Change | Status |
 |---|---|
 | 0014-per-site-window – longer digest window for slow sites (Znośne Newsy 7 days) | ✅ archived |
-| 0015-whats-new – mark what is new since the last digest | ⏳ |
+| 0015-whats-new – mark what is new since the last digest | ✅ archived |
 | 0016-followed-topics – follow stories / topics; followed ones show only updates | ⏳ |
 
 **Exit:** a followed story shows only its updates in later digests.

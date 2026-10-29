@@ -76,6 +76,8 @@ MIGRATIONS = [
         reason     TEXT NOT NULL
     );
     """,
+    # 5 (0015): when digests were written, to mark what is new since the last one
+    "CREATE TABLE digest_run (id INTEGER PRIMARY KEY, generated_at TEXT NOT NULL);",
 ]
 
 

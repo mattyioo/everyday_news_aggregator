@@ -32,10 +32,14 @@ def story(conn, *articles: tuple, lang: str = "en") -> int:
     for source, hours_ago, title, text, verdict in articles:
         n = conn.execute("SELECT COUNT(*) FROM article").fetchone()[0] + 1
         published = (NOW - timedelta(hours=hours_ago)).isoformat()
+        raw_id = conn.execute(
+            "INSERT INTO raw_item (source_id, guid, fetched_at) VALUES (?, ?, ?)",
+            (source, f"g{n}", published),
+        ).lastrowid
         article_id = conn.execute(
             "INSERT INTO article (raw_item_id, source_id, lang, url, title, text, published_at,"
             " title_hash) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-            (n, source, lang, f"https://x/{n}", title, text, published, title_hash(title)),
+            (raw_id, source, lang, f"https://x/{n}", title, text, published, title_hash(title)),
         ).lastrowid
         conn.execute("INSERT INTO story_article VALUES (?, ?)", (story_id, article_id))
         if verdict:

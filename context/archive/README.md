@@ -19,3 +19,4 @@ Finished changes, moved here from `context/change/`. Not edited after archiving.
 | 0012-markdown-digest | 3 | 2026-10-29 | `news digest` / `news run` write `digests/YYYY-MM-DD.md`, one section per site |
 | 0013-filtered-report | 3 | 2026-10-29 | Digest ends with dropped articles by reason (links) and a downrank tally |
 | 0014-per-site-window | 4 | 2026-10-29 | Optional per-source `digest_hours`; Znośne Newsy 7 days |
+| 0015-whats-new | 4 | 2026-10-29 | 🆕/🔄 markers since the last digest (by fetch time), new first per site, story ids |

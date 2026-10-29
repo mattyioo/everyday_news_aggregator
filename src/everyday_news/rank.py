@@ -26,6 +26,7 @@ class Item:
     discussion_url: str | None
     text: str
     published: datetime
+    fetched: datetime  # when this app first stored it
     action: str | None  # "drop", "downrank" or None
     reason: str | None
 
@@ -72,10 +73,12 @@ def rank_stories(
     by_story: dict[int, tuple[str, list[Item]]] = {}
     for row in conn.execute(
         """
-        SELECT story.id AS story_id, story.lang, article.*, v.action, v.reason
+        SELECT story.id AS story_id, story.lang, article.*, raw_item.fetched_at,
+               v.action, v.reason
         FROM story
         JOIN story_article ON story_article.story_id = story.id
         JOIN article ON article.id = story_article.article_id
+        JOIN raw_item ON raw_item.id = article.raw_item_id
         LEFT JOIN article_verdict v ON v.article_id = article.id
         """
     ):
@@ -87,6 +90,7 @@ def rank_stories(
             discussion_url=row["discussion_url"],
             text=row["text"],
             published=datetime.fromisoformat(row["published_at"]),
+            fetched=datetime.fromisoformat(row["fetched_at"]),
             action=row["action"],
             reason=row["reason"],
         )
