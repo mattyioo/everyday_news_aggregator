@@ -20,7 +20,8 @@ sources.toml ──► Fetch ──► Normalize ──► Dedupe/Cluster ──
 | **Dedupe/Cluster** | Mark exact duplicates (same canonical URL, or same title hash + lang) and keep the highest-weight source as primary; group articles about the same event into a `Story` by fuzzy title match, within one language |
 | **Filter/Score** | Rule-based only: muted topics, per-language clickbait patterns, heuristic score (source weight, recency, number of sources covering it). Every decision records a reason |
 | **Summarize** | Extractive, no LLM: feed description, or the first sentences of the article text |
-| **Digest** | Render the day's top stories to Markdown (later: HTML / web view) |
+| **Digest** | Render the day's top stories to Markdown, one section per site (no topic categories) |
+| **Prune** | At launch, delete articles not seen in their feed for `retention_days` (30) |
 | **Tracking** *(Phase 4)* | Followed topics; show what is new since the last digest |
 | **CLI** | Entry point: `news fetch`, `news digest`, `news run` (everything) |
 
@@ -32,7 +33,7 @@ fetch_fulltext), not in the database. Database: `news.db` (SQLite, gitignored).
 Built (Phase 1):
 
 - `fetch_state` – source_id, last_fetched_at, last_status, etag, last_modified
-- `raw_item` – id, source_id, guid, url, title, summary (HTML), comments_url, published, fetched_at; unique (source_id, guid)
+- `raw_item` – id, source_id, guid, url, title, summary (HTML), comments_url, published, fetched_at, last_seen_at (retention); unique (source_id, guid)
 - `article` – id, raw_item_id (unique), source_id, lang, url (canonical, tracking params removed), discussion_url (HN / Reddit thread), title, text (plain), published_at (UTC ISO), title_hash, duplicate_of (Phase 2: NULL = shown; else the primary article's id)
 
 Schema changes to an existing `news.db` go through `MIGRATIONS` in `db.py` (tracked by `PRAGMA user_version`); never edit a committed migration.

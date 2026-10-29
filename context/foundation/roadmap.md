@@ -6,6 +6,9 @@ described in `context/README.md`: Propose → Plan → Build → Verify → Arch
 
 A phase is done when all its changes are archived and its exit criteria hold.
 
+Planned changes have no number yet; a number is assigned when the change is proposed
+(next free number), so inserting work never renumbers the plan.
+
 Status: ✅ done · 🔄 in progress · ⏳ not started · ❌ dropped
 
 ---
@@ -42,9 +45,10 @@ Turn a pile of articles into a short list of real stories.
 | Change | Status |
 |---|---|
 | 0006-exact-dedupe – same canonical URL or same title hash | ✅ archived |
-| 0007-story-clustering – group same-event articles into stories (fuzzy titles, per language) | ⏳ |
-| 0008-rule-filters – muted topics, EN + PL clickbait patterns, with reasons | ⏳ |
-| 0009-heuristic-scoring – rank by source weight, recency, coverage | ⏳ |
+| 0007-story-clustering – group same-event articles into stories (fuzzy titles, per language) | 🔄 Propose |
+| 0008-retention – delete articles 30 days after they leave their feed | ✅ archived |
+| rule-filters – muted topics, EN + PL clickbait patterns, with reasons | ⏳ |
+| heuristic-scoring – rank by source weight, recency, coverage | ⏳ |
 
 **Exit:** a day's articles reduce to a ranked story list; every drop has a reason.
 
@@ -54,9 +58,9 @@ Something to actually read.
 
 | Change | Status |
 |---|---|
-| 0010-summaries – extractive per-story summary (feed description / lead sentences) | ⏳ |
-| 0011-markdown-digest – `digests/YYYY-MM-DD.md`, English and Polish sections | ⏳ |
-| 0012-filtered-report – "what was dropped and why" section | ⏳ |
+| summaries – extractive per-story summary (feed description / lead sentences) | ⏳ |
+| markdown-digest – `digests/YYYY-MM-DD.md`, one section per site | ⏳ |
+| filtered-report – "what was dropped and why" section | ⏳ |
 
 **Exit:** `news run` produces a digest readable in under 10 minutes.
 
@@ -66,8 +70,8 @@ Follow stories over days instead of rereading them.
 
 | Change | Status |
 |---|---|
-| 0013-followed-topics – follow/unfollow topics or stories | ⏳ |
-| 0014-whats-new – show only new developments since last digest | ⏳ |
+| followed-topics – follow/unfollow topics or stories | ⏳ |
+| whats-new – show only new developments since last digest | ⏳ |
 
 **Exit:** a followed story shows only its updates in later digests.
 
@@ -77,8 +81,8 @@ Nicer to use.
 
 | Change | Status |
 |---|---|
-| ~~0015-scheduled-runs~~ – dropped: refresh only on launch (see decisions) | ❌ |
-| 0016-feedback-loop – mark items as noise/useful to tune filters | ⏳ |
-| 0017-web-view *(optional)* – local page for browsing digests | ⏳ |
+| ~~scheduled-runs~~ – dropped: refresh only on launch (see decisions) | ❌ |
+| feedback-loop – mark items as noise/useful to tune filters | ⏳ |
+| web-view *(optional)* – local page for browsing digests | ⏳ |
 
 **Exit:** one `news run` on launch gives a tuned, readable digest.

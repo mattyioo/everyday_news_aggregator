@@ -108,6 +108,7 @@ def _fetch_one(
     else:
         code = response.status_code
         if code == 304:
+            _mark_unchanged_feed_seen(source, conn, fetched_at)
             result = FetchResult(source.id, "304", "not modified", requested=True)
         elif code == 200:
             etag = response.headers.get("etag")
@@ -137,8 +138,12 @@ def _fetch_one(
 def _store_items(
     source: Source, content: bytes, conn: sqlite3.Connection, fetched_at: datetime
 ) -> tuple[int, int]:
-    """Insert parsed entries, skipping ones already stored. Returns (total, new)."""
+    """Insert parsed entries, skipping ones already stored. Returns (total, new).
+
+    Every entry in the feed, new or not, gets `last_seen_at` = this fetch.
+    """
     feed = feedparser.parse(content)
+    seen = fetched_at.isoformat()
     new = 0
     for entry in feed.entries:
         guid = entry.get("id") or entry.get("link")
@@ -147,8 +152,9 @@ def _store_items(
         cursor = conn.execute(
             """
             INSERT OR IGNORE INTO raw_item
-                (source_id, guid, url, title, summary, comments_url, published, fetched_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                (source_id, guid, url, title, summary, comments_url, published, fetched_at,
+                 last_seen_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 source.id,
@@ -158,11 +164,33 @@ def _store_items(
                 entry.get("summary"),
                 entry.get("comments"),
                 _published(entry),
-                fetched_at.isoformat(),
+                seen,
+                seen,
             ),
         )
-        new += cursor.rowcount
+        if cursor.rowcount:
+            new += 1
+        else:
+            conn.execute(
+                "UPDATE raw_item SET last_seen_at = ? WHERE source_id = ? AND guid = ?",
+                (seen, source.id, guid),
+            )
     return len(feed.entries), new
+
+
+def _mark_unchanged_feed_seen(
+    source: Source, conn: sqlite3.Connection, fetched_at: datetime
+) -> None:
+    """A 304 means the feed still holds exactly what the last successful fetch saw:
+    the items sharing the source's latest `last_seen_at`."""
+    conn.execute(
+        """
+        UPDATE raw_item SET last_seen_at = ?
+        WHERE source_id = ?
+          AND last_seen_at = (SELECT MAX(last_seen_at) FROM raw_item WHERE source_id = ?)
+        """,
+        (fetched_at.isoformat(), source.id, source.id),
+    )
 
 
 def _published(entry: feedparser.FeedParserDict) -> str | None:

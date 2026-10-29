@@ -28,4 +28,7 @@ python3 -m venv .venv
 .venv/bin/uv run ruff check
 ```
 
+Feeds are configured in `sources.toml`; `settings.toml` sets how long news is kept
+(`retention_days`, default 30 days after an article leaves its feed).
+
 Project plans and change history live in `context/` (see `context/README.md`).

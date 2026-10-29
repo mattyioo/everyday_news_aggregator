@@ -50,6 +50,9 @@ CREATE INDEX IF NOT EXISTS article_published_at ON article (published_at);
 MIGRATIONS = [
     # 1 (0006): exact duplicates point at the article that is shown instead
     "ALTER TABLE article ADD COLUMN duplicate_of INTEGER REFERENCES article (id);",
+    # 2 (0008): when an item was last present in its feed, for retention
+    "ALTER TABLE raw_item ADD COLUMN last_seen_at TEXT;"
+    " UPDATE raw_item SET last_seen_at = fetched_at;",
 ]
 
 

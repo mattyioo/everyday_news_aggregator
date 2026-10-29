@@ -18,7 +18,8 @@
 ## Context docs
 
 - Markdown only.
-- Change folders: `NNNN-short-slug`, numbered in order, never reused.
+- Change folders: `NNNN-short-slug`, numbered in order of proposal, never reused once committed.
+  Planned changes in the roadmap stay unnumbered until proposed.
 - One change = one coherent outcome. If a change grows past ~1 day of work, split it.
 - Every code change belongs to a change folder; no untracked work.
 - Dates in logs use `YYYY-MM-DD`.
