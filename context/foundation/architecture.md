@@ -34,7 +34,7 @@ Built (Phase 1):
 
 - `fetch_state` – source_id, last_fetched_at, last_status, etag, last_modified
 - `raw_item` – id, source_id, guid, url, title, summary (HTML), comments_url, published, fetched_at, last_seen_at (retention); unique (source_id, guid)
-- `article` – id, raw_item_id (unique), source_id, lang, url (canonical, tracking params removed), discussion_url (HN / Reddit thread), title, text (plain), published_at (UTC ISO), title_hash, duplicate_of (Phase 2: NULL = shown; else the primary article's id)
+- `article` – id, raw_item_id (unique), source_id, lang, url (canonical: tracking params removed, host aliases like bbc.com → www.bbc.co.uk), discussion_url (HN / Reddit thread), title, text (plain), published_at (UTC ISO), title_hash, duplicate_of (Phase 2: NULL = shown; else the primary article's id)
 
 Schema changes to an existing `news.db` go through `MIGRATIONS` in `db.py` (tracked by `PRAGMA user_version`); never edit a committed migration.
 

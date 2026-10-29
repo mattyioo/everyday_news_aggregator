@@ -15,7 +15,7 @@ def mark_duplicates(conn: sqlite3.Connection, sources: list[Source]) -> int:
     """Recompute `duplicate_of` for all articles. Returns how many are duplicates."""
     weights = {s.id: s.weight for s in sources}
     rows = conn.execute(
-        "SELECT id, source_id, lang, url, title_hash, published_at, duplicate_of FROM article"
+        "SELECT id, source_id, lang, url, title_hash, text, published_at, duplicate_of FROM article"
     ).fetchall()
 
     parent = {row["id"]: row["id"] for row in rows}
@@ -40,10 +40,16 @@ def mark_duplicates(conn: sqlite3.Connection, sources: list[Source]) -> int:
 
     duplicates = 0
     for members in groups.values():
-        # Primary: most trusted source, then first published, then first stored.
+        # Primary: most trusted source, then one with text (HN items have none),
+        # then first published, then first stored.
         primary = min(
             members,
-            key=lambda r: (-weights.get(r["source_id"], 0.0), r["published_at"], r["id"]),
+            key=lambda r: (
+                -weights.get(r["source_id"], 0.0),
+                not r["text"],
+                r["published_at"],
+                r["id"],
+            ),
         )
         for row in members:
             target = None if row is primary else primary["id"]

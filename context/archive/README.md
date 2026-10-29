@@ -21,3 +21,4 @@ Finished changes, moved here from `context/change/`. Not edited after archiving.
 | 0014-per-site-window | 4 | 2026-10-29 | Optional per-source `digest_hours`; Znośne Newsy 7 days |
 | 0015-whats-new | 4 | 2026-10-29 | 🆕/🔄 markers since the last digest (by fetch time), new first per site, story ids |
 | 0016-followed-topics | 4 | 2026-10-29 | Follow stories (`news follow`) and topics (`follow.toml`); Following section shows only updates |
+| 0017-bbc-host-alias | 5 | 2026-10-29 | bbc.com = bbc.co.uk in canonical URLs; primary prefers text; borrowed HN discussion link |

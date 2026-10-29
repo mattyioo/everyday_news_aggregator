@@ -122,3 +122,22 @@ def test_parse_html_collects_text_and_links() -> None:
     text, links = parse_html('<p>Hi <a href="https://x">there</a></p><img src="y">')
     assert text.strip() == "Hi there"
     assert links == [("https://x", "there")]
+
+
+def test_bbc_com_and_co_uk_are_the_same_article() -> None:
+    hn_link = "https://www.bbc.com/news/articles/cm8xz7pkd0jjo"
+    feed_link = "https://www.bbc.co.uk/news/articles/cm8xz7pkd0jjo?at_medium=RSS&at_campaign=rss"
+    assert canonical_url(hn_link) == canonical_url(feed_link)
+    assert canonical_url("https://bbc.com/x") == "https://www.bbc.co.uk/x"
+
+
+def test_recanonicalize_updates_stored_urls(conn) -> None:
+    from everyday_news.normalize import recanonicalize
+
+    normalize_pending(conn, SOURCES)
+    conn.execute("UPDATE article SET url = 'https://www.bbc.com/news/1' WHERE id = 1")
+    assert recanonicalize(conn) == 1
+    assert conn.execute("SELECT url FROM article WHERE id = 1").fetchone()[0] == (
+        "https://www.bbc.co.uk/news/1"
+    )
+    assert recanonicalize(conn) == 0

@@ -21,7 +21,7 @@ from everyday_news.digest import (
 )
 from everyday_news.fetch import fetch_all, make_client
 from everyday_news.filters import FilterConfigError, Filters, apply_filters, load_filters
-from everyday_news.normalize import normalize_pending
+from everyday_news.normalize import normalize_pending, recanonicalize
 from everyday_news.prune import prune
 from everyday_news.rank import rank_stories, stories_by_id
 from everyday_news.sources import DEFAULT_PATH, Source, SourceConfigError, load_sources
@@ -79,6 +79,7 @@ def fetch(
             results = fetch_all(sources, conn, client, force=force)
         deleted = prune(conn, sources, settings.retention_days, datetime.now(UTC))
         added = normalize_pending(conn, sources)
+        recanonicalize(conn)
         duplicates = mark_duplicates(conn, sources)
         cluster(conn, sources)
         filtered = apply_filters(conn, filters)

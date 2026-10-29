@@ -124,3 +124,19 @@ def test_per_site_window_overrides_global(tmp_path: Path) -> None:
     ranking = rank_stories(conn, [*SOURCES, slow], NOW, 24)
     assert [s.lead.title for s in ranking.stories] == ["Slow site post"]
     conn.close()
+
+
+def test_primary_borrows_discussion_link_from_its_duplicate(conn) -> None:
+    story(conn, ("bbc", 1, "Spain crash: what we know", "Lead.", None))
+    raw = conn.execute(
+        "INSERT INTO raw_item (source_id, guid, fetched_at) VALUES ('hn', 'dup', ?)",
+        (NOW.isoformat(),),
+    ).lastrowid
+    conn.execute(
+        "INSERT INTO article (raw_item_id, source_id, lang, url, discussion_url, title, text,"
+        " published_at, title_hash, duplicate_of) VALUES (?, 'hn', 'en', 'https://x/1',"
+        " 'https://news.ycombinator.com/item?id=1', 'Spain crash', '', ?, 'h', 1)",
+        (raw, NOW.isoformat()),
+    )
+    (s,) = rank(conn).stories
+    assert s.lead.discussion_url == "https://news.ycombinator.com/item?id=1"

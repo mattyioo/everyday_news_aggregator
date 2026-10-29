@@ -78,14 +78,15 @@ Follow stories over days instead of rereading them.
 **Exit:** a followed story shows only its updates in later digests.
 _Met 2026-10-29: tested, and shown on a copy of the real DB (followed Spain crash story listed only its new article)._
 
-## Phase 5 – Automation & Polish
+## Phase 5 – Automation & Polish 🔄
 
 Nicer to use.
 
 | Change | Status |
 |---|---|
 | ~~scheduled-runs~~ – dropped: refresh only on launch (see decisions) | ❌ |
+| 0017-bbc-host-alias – same BBC article on bbc.com and bbc.co.uk is one article | ✅ archived |
+| 0018-web-view – local page for browsing digests | ⏳ |
 | feedback-loop – mark items as noise/useful to tune filters | ⏳ |
-| web-view *(optional)* – local page for browsing digests | ⏳ |
 
 **Exit:** one `news run` on launch gives a tuned, readable digest.

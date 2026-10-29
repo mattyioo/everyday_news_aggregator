@@ -17,6 +17,10 @@ from everyday_news.sources import Source
 
 TRACKING_PARAMS = {"fbclid", "gclid", "mc_cid", "mc_eid", "ref_src", "at_medium", "at_campaign"}
 
+# Hosts that serve the same articles under another name (HN links bbc.com, the BBC
+# feed uses bbc.co.uk for the same /news/articles/<id>)
+HOST_ALIASES = {"bbc.com": "www.bbc.co.uk", "www.bbc.com": "www.bbc.co.uk"}
+
 # WordPress footers: "Artykuł X pochodzi z serwisu Y." / "The post X appeared first on Y."
 FOOTERS = [
     re.compile(r"Artykuł .+? pochodzi z serwisu .+?\.?$", re.S),
@@ -82,16 +86,16 @@ def collapse(text: str) -> str:
 
 
 def canonical_url(url: str) -> str:
-    """Lowercase scheme/host and drop tracking query params."""
+    """Lowercase scheme/host, map host aliases and drop tracking query params."""
     parts = urlsplit(url.strip())
     query = [
         (k, v)
         for k, v in parse_qsl(parts.query, keep_blank_values=True)
         if not k.startswith("utm_") and k not in TRACKING_PARAMS
     ]
-    return urlunsplit(
-        (parts.scheme.lower(), parts.netloc.lower(), parts.path, urlencode(query), parts.fragment)
-    )
+    host = parts.netloc.lower()
+    host = HOST_ALIASES.get(host, host)
+    return urlunsplit((parts.scheme.lower(), host, parts.path, urlencode(query), parts.fragment))
 
 
 def title_hash(title: str) -> str:
@@ -196,3 +200,16 @@ def normalize_pending(conn: sqlite3.Connection, sources: list[Source]) -> int:
         added += 1
     conn.commit()
     return added
+
+
+def recanonicalize(conn: sqlite3.Connection) -> int:
+    """Re-apply `canonical_url` to stored articles (after the rules change).
+    Returns how many URLs changed."""
+    changed = 0
+    for row in conn.execute("SELECT id, url FROM article").fetchall():
+        url = canonical_url(row["url"])
+        if url != row["url"]:
+            conn.execute("UPDATE article SET url = ? WHERE id = ?", (url, row["id"]))
+            changed += 1
+    conn.commit()
+    return changed

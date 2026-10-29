@@ -174,7 +174,9 @@ def _following_section(
     for story in following.stories:
         shown.add(story.id)
         lead = story.lead
-        out.append(f"- 📌 **[{escape(lead.title)}]({lead.url})** · \\#{story.id}")
+        out.append(
+            f"- 📌 **[{escape(lead.title)}]({lead.url})** · \\#{story.id}{_discussion(lead)}"
+        )
         if since is None:
             out.append("  _first digest: updates will show from the next one_")
             continue

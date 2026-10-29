@@ -107,7 +107,11 @@ def _load_items(conn: sqlite3.Connection) -> dict[int, tuple[str, list[Item]]]:
     for row in conn.execute(
         """
         SELECT story.id AS story_id, story.lang, article.*, raw_item.fetched_at,
-               v.action, v.reason
+               v.action, v.reason,
+               -- a duplicate's discussion link (e.g. the HN thread about a BBC article)
+               (SELECT d.discussion_url FROM article d
+                WHERE d.duplicate_of = article.id AND d.discussion_url IS NOT NULL
+                ORDER BY d.id LIMIT 1) AS borrowed_discussion_url
         FROM story
         JOIN story_article ON story_article.story_id = story.id
         JOIN article ON article.id = story_article.article_id
@@ -120,7 +124,7 @@ def _load_items(conn: sqlite3.Connection) -> dict[int, tuple[str, list[Item]]]:
             source_id=row["source_id"],
             title=row["title"],
             url=row["url"],
-            discussion_url=row["discussion_url"],
+            discussion_url=row["discussion_url"] or row["borrowed_discussion_url"],
             text=row["text"],
             published=datetime.fromisoformat(row["published_at"]),
             fetched=datetime.fromisoformat(row["fetched_at"]),

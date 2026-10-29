@@ -110,3 +110,22 @@ def test_old_database_is_migrated_in_place(tmp_path: Path) -> None:
 
     # Reopening doesn't re-run migrations
     db.connect(path).close()
+
+
+def test_same_weight_prefers_the_article_with_text(conn) -> None:
+    sources = [
+        Source(id="bbc", name="BBC", url="https://bbc.example/f", lang="en", weight=1.0),
+        Source(id="hn", name="HN", url="https://hn.example/f", lang="en", weight=1.0),
+    ]
+    hn = add(
+        conn,
+        "hn",
+        "https://www.bbc.co.uk/news/1",
+        "Spain crash",
+        published="2026-10-29T08:00:00+00:00",
+    )
+    bbc = add(conn, "bbc", "https://www.bbc.co.uk/news/1", "Spain crash: what we know",
+              published="2026-10-29T10:00:00+00:00")  # fmt: skip
+    conn.execute("UPDATE article SET text = 'Lead.' WHERE id = ?", (bbc,))
+    mark_duplicates(conn, sources)
+    assert duplicate_of(conn) == {hn: bbc, bbc: None}
