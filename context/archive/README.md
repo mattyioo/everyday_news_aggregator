@@ -13,3 +13,4 @@ Finished changes, moved here from `context/change/`. Not edited after archiving.
 | 0006-exact-dedupe | 2 | 2026-10-29 | `duplicate_of` via url / (lang, title) groups, highest-weight primary; schema migrations |
 | 0007-story-clustering | 2 | 2026-10-29 | `story` tables; same-event grouping per language, rolling 3-day window, stable ids; `news stories` |
 | 0008-retention | 2 | 2026-10-29 | Delete articles 30 days after last seen in their feed (`settings.toml`), at launch |
+| 0009-rule-filters | 2 | 2026-10-29 | `filters.toml`: muted words + EN/PL headline rules (drop/downrank) with reasons |

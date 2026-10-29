@@ -1,0 +1,100 @@
+# Noise filters. Edit freely: changes apply to all stored articles on the next run.
+#
+# muted: words to hide completely, matched in title and text. Case-insensitive;
+#   4+ letters match the start of a word ("celebry" hides celebryta, celebryci...;
+#   pick a stem short enough to cover Polish endings),
+#   shorter ones must be a whole word.
+#
+# [[rule]]: a regular expression matched against the title (case-insensitive).
+#   lang     "en", "pl" or "any"
+#   action   "drop" = hide the article, "downrank" = keep it but rank it lower
+#   reason   shown in the digest's "filtered out" list
+#   Use single quotes for patterns so backslashes need no escaping.
+
+muted = []
+
+# --- Polish: drop ---
+
+[[rule]]
+lang = "pl"
+pattern = '\b(aż|już|ponad|blisko)\s+[\d,.]+\s*(mln|tys\.?|milion\w*|tysi\w*)\s+wyświetle'
+action = "drop"
+reason = "clickbait: view-count bait"
+
+[[rule]]
+lang = "pl"
+pattern = '\bnie uwierzysz\b|\bszok\w*\b|\bhit (internetu|sieci)\b|\binternauci (oszaleli|zachwyceni|komentują)'
+action = "drop"
+reason = "clickbait: sensational phrasing"
+
+[[rule]]
+lang = "pl"
+pattern = '\bmusisz (to )?zobaczyć\b|\btego (nie )?wiedziałeś\b'
+action = "drop"
+reason = "clickbait: sensational phrasing"
+
+# --- Polish: downrank ---
+
+[[rule]]
+lang = "pl"
+pattern = '\[skrót dnia\]'
+action = "downrank"
+reason = "roundup"
+
+[[rule]]
+lang = "pl"
+pattern = '\b(jest|mamy) (nagranie|wideo|reakcja|odpowiedź|żądanie|komentarz)\b'
+action = "downrank"
+reason = "teaser headline"
+
+[[rule]]
+lang = "pl"
+pattern = '\b(ostra|szybka|stanowcza|zaskakująca) (reakcja|odpowiedź)\b'
+action = "downrank"
+reason = "teaser headline"
+
+[[rule]]
+lang = "pl"
+pattern = '(^|[.!?"]\s+)(tak|oto)\s+\w+'
+action = "downrank"
+reason = "teaser headline"
+
+[[rule]]
+lang = "pl"
+pattern = '\b(zobacz|sprawdź|wiemy,? (co|kto|ile|jak))\b'
+action = "downrank"
+reason = "teaser headline"
+
+# --- English: drop ---
+
+[[rule]]
+lang = "en"
+pattern = "you won't believe|\\bwhat happens next\\b|\\b(goes|went) viral\\b|\\bjaw-?dropping\\b|\\bmind-?blowing\\b|\\bwill (shock|blow your mind)\\b"
+action = "drop"
+reason = "clickbait: sensational phrasing"
+
+# --- English: downrank ---
+
+[[rule]]
+lang = "en"
+pattern = '^(watch|video):'
+action = "downrank"
+reason = "video"
+
+[[rule]]
+lang = "en"
+pattern = '^launch hn:'
+action = "downrank"
+reason = "promotion (YC launch)"
+
+[[rule]]
+lang = "en"
+pattern = '^\d+\s+(things|reasons|ways|tips|facts)\b'
+action = "downrank"
+reason = "listicle"
+
+[[rule]]
+lang = "en"
+pattern = "\\b(here's|this is) (why|what|how)\\b"
+action = "downrank"
+reason = "teaser headline"

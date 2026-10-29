@@ -5,6 +5,7 @@ from typer.testing import CliRunner
 from everyday_news.cli import app
 
 runner = CliRunner()
+ROOT = Path(__file__).parent.parent
 
 
 def test_help_lists_commands() -> None:
@@ -32,6 +33,8 @@ def test_run_calls_fetch_and_digest(tmp_path: Path) -> None:
             str(config),
             "--settings",
             str(settings),
+            "--filters",
+            str(ROOT / "filters.toml"),
             "--db",
             str(tmp_path / "x.db"),
         ],
@@ -39,5 +42,5 @@ def test_run_calls_fetch_and_digest(tmp_path: Path) -> None:
     assert result.exit_code == 0, result.output
     assert "x  skipped  disabled" in result.output
     assert "0 request(s) sent, 0 new article(s), 0 duplicate(s), 0 deleted" in result.output
-    assert "0 stories" in result.output
+    assert "0 stories, 0 filtered" in result.output
     assert "digest:" in result.output

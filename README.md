@@ -29,6 +29,7 @@ python3 -m venv .venv
 .venv/bin/uv run ruff check
 ```
 
+Noise rules and muted words live in `filters.toml`.
 Feeds are configured in `sources.toml`; `settings.toml` sets how long news is kept
 (`retention_days`, currently 7 days after an article leaves its feed).
 

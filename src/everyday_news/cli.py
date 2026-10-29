@@ -12,6 +12,7 @@ from everyday_news import settings as cfg
 from everyday_news.cluster import cluster
 from everyday_news.dedupe import mark_duplicates
 from everyday_news.fetch import fetch_all, make_client
+from everyday_news.filters import FilterConfigError, Filters, apply_filters, load_filters
 from everyday_news.normalize import normalize_pending
 from everyday_news.prune import prune
 from everyday_news.sources import DEFAULT_PATH, Source, SourceConfigError, load_sources
@@ -21,6 +22,7 @@ app = typer.Typer(help="Personal news aggregator.", no_args_is_help=True)
 ConfigOption = Annotated[Path, typer.Option("--config", help="Path to sources.toml")]
 DbOption = Annotated[Path, typer.Option("--db", help="Path to the SQLite database")]
 SettingsOption = Annotated[Path, typer.Option("--settings", help="Path to settings.toml")]
+FiltersOption = Annotated[Path, typer.Option("--filters", help="Path to filters.toml")]
 
 
 def _load(config: Path) -> list[Source]:
@@ -39,6 +41,14 @@ def _load_settings(path: Path) -> cfg.Settings:
         raise typer.Exit(1) from None
 
 
+def _load_filters(path: Path) -> Filters:
+    try:
+        return load_filters(path)
+    except FilterConfigError as e:
+        typer.echo(f"error: {e}", err=True)
+        raise typer.Exit(1) from None
+
+
 @app.command()
 def fetch(
     force: Annotated[
@@ -46,11 +56,13 @@ def fetch(
     ] = False,
     config: ConfigOption = DEFAULT_PATH,
     settings_path: SettingsOption = cfg.DEFAULT_PATH,
+    filters_path: FiltersOption = Path("filters.toml"),
     db_path: DbOption = db.DEFAULT_PATH,
 ) -> None:
     """Fetch all enabled sources once into the local database, then delete old news."""
     sources = _load(config)
     settings = _load_settings(settings_path)
+    filters = _load_filters(filters_path)
     conn = db.connect(db_path)
     try:
         with make_client() as client:
@@ -59,6 +71,7 @@ def fetch(
         added = normalize_pending(conn, sources)
         duplicates = mark_duplicates(conn, sources)
         cluster(conn, sources)
+        filtered = apply_filters(conn, filters)
         stories = conn.execute("SELECT COUNT(*) FROM story").fetchone()[0]
     finally:
         conn.close()
@@ -69,7 +82,8 @@ def fetch(
     requests = sum(r.requested for r in results)
     typer.echo(
         f"{requests} request(s) sent, {added} new article(s), {duplicates} duplicate(s), "
-        f"{deleted} deleted (older than {settings.retention_days} days), {stories} stories"
+        f"{deleted} deleted (older than {settings.retention_days} days), {stories} stories, "
+        f"{filtered} filtered"
     )
 
 
@@ -83,10 +97,17 @@ def digest() -> None:
 def run(
     config: ConfigOption = DEFAULT_PATH,
     settings_path: SettingsOption = cfg.DEFAULT_PATH,
+    filters_path: FiltersOption = Path("filters.toml"),
     db_path: DbOption = db.DEFAULT_PATH,
 ) -> None:
     """Run the full pipeline: fetch, then digest."""
-    fetch(force=False, config=config, settings_path=settings_path, db_path=db_path)
+    fetch(
+        force=False,
+        config=config,
+        settings_path=settings_path,
+        filters_path=filters_path,
+        db_path=db_path,
+    )
     digest()
 
 

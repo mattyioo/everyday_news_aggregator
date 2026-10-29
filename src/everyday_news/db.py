@@ -68,6 +68,14 @@ MIGRATIONS = [
     );
     CREATE INDEX story_article_story ON story_article (story_id);
     """,
+    # 4 (0009): noise filter decisions, recomputed every run
+    """
+    CREATE TABLE article_verdict (
+        article_id INTEGER PRIMARY KEY REFERENCES article (id),
+        action     TEXT NOT NULL,
+        reason     TEXT NOT NULL
+    );
+    """,
 ]
 
 
