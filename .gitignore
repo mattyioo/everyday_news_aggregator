@@ -6,3 +6,6 @@ __pycache__/
 .env
 *.db
 digests/
+
+# Local Claude Code subagents (not shared)
+.claude/agents/
