@@ -7,6 +7,7 @@ import typer
 
 from everyday_news import db
 from everyday_news.fetch import fetch_all, make_client
+from everyday_news.normalize import normalize_pending
 from everyday_news.sources import DEFAULT_PATH, Source, SourceConfigError, load_sources
 
 app = typer.Typer(help="Personal news aggregator.", no_args_is_help=True)
@@ -37,6 +38,7 @@ def fetch(
     try:
         with make_client() as client:
             results = fetch_all(sources, conn, client, force=force)
+        added = normalize_pending(conn, sources)
     finally:
         conn.close()
 
@@ -44,7 +46,7 @@ def fetch(
     for r in results:
         typer.echo(f"{r.source_id:<{width}}  {r.status:<7}  {r.detail}")
     requests = sum(r.requested for r in results)
-    typer.echo(f"{requests} request(s) sent")
+    typer.echo(f"{requests} request(s) sent, {added} new article(s)")
 
 
 @app.command()

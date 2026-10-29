@@ -20,7 +20,7 @@ Set up the context system and agree on the vision.
 
 **Exit:** context folders exist, vision/architecture/roadmap written.
 
-## Phase 1 – Ingestion 🔄
+## Phase 1 – Ingestion ✅
 
 Get articles from my sources into a local database.
 
@@ -29,7 +29,7 @@ Get articles from my sources into a local database.
 | 0001-project-skeleton – package, CLI stub, tooling, tests running | ✅ archived |
 | 0002-sources-config – `sources.toml` with HN, r/technology, WP.pl, znosnenewsy.pl (lang, tags, weights) | ✅ archived |
 | 0003-feed-fetcher – fetch RSS/Atom once per launch, politely (User-Agent, conditional GET, no retries); store raw items | ✅ archived |
-| 0004-normalize-and-store – `Article` model, SQLite schema | ⏳ |
+| 0004-normalize-and-store – `Article` model, SQLite schema | ✅ archived |
 
 **Exit:** `news fetch` pulls all configured feeds into SQLite without errors.
 

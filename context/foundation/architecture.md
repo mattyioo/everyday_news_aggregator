@@ -24,10 +24,19 @@ sources.toml ──► Fetch ──► Normalize ──► Dedupe/Cluster ──
 | **Tracking** *(Phase 4)* | Followed topics; show what is new since the last digest |
 | **CLI** | Entry point: `news fetch`, `news digest`, `news run` (everything) |
 
-## Data model (initial)
+## Data model
 
-- `source` – id, name, url, lang, tags, weight, fetch_fulltext, enabled
-- `article` – id, source_id, url, title, lang, published_at, text, content_hash, fetched_at
+Sources live in `sources.toml` (id, name, url, lang, weight, tags, enabled,
+fetch_fulltext), not in the database. Database: `news.db` (SQLite, gitignored).
+
+Built (Phase 1):
+
+- `fetch_state` – source_id, last_fetched_at, last_status, etag, last_modified
+- `raw_item` – id, source_id, guid, url, title, summary (HTML), comments_url, published, fetched_at; unique (source_id, guid)
+- `article` – id, raw_item_id (unique), source_id, lang, url (canonical, tracking params removed), discussion_url (HN / Reddit thread), title, text (plain), published_at (UTC ISO), title_hash
+
+Planned:
+
 - `story` – id, title, first_seen, last_updated
 - `story_article` – story_id, article_id
 - `verdict` – article_id or story_id, kept (bool), score, reason

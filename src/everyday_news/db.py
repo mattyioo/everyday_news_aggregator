@@ -26,6 +26,22 @@ CREATE TABLE IF NOT EXISTS raw_item (
     fetched_at   TEXT NOT NULL,
     UNIQUE (source_id, guid)
 );
+
+CREATE TABLE IF NOT EXISTS article (
+    id             INTEGER PRIMARY KEY,
+    raw_item_id    INTEGER NOT NULL UNIQUE REFERENCES raw_item (id),
+    source_id      TEXT NOT NULL,
+    lang           TEXT NOT NULL,
+    url            TEXT NOT NULL,
+    discussion_url TEXT,
+    title          TEXT NOT NULL,
+    text           TEXT NOT NULL,
+    published_at   TEXT NOT NULL,
+    title_hash     TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS article_title_hash ON article (title_hash);
+CREATE INDEX IF NOT EXISTS article_published_at ON article (published_at);
 """
 
 
